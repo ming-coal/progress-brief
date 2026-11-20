@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1 — 2026-11-20
+
+- `lint.py` — an eleventh rule: relative links must resolve. A missing **image** is an
+  error (it renders as a broken box on GitHub); a missing **link** is a warning, so
+  `--strict` can promote it. Remote URLs, `#anchors`, fenced code blocks and paths that
+  leave the project are ignored — nothing is guessed.
+- `tests/test_rules.py` — the "N rules" number in `PROGRESS.md` is now asserted against
+  `lint.RULES`. 0.1.0 shipped a count that was one too high; this release makes the
+  sentence true instead of fixing the sentence.
+- 73 tests, up from 55. The new rule was written after this repo's own `PROGRESS.md`
+  pointed at an image that had been renamed two commits earlier.
+
 ## 0.1.0 — 2026-11-20
 
 First release.

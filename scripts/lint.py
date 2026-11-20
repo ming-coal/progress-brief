@@ -11,6 +11,7 @@ import json
 import os
 import re
 import sys
+from urllib.parse import unquote
 
 def _utf8_stdio():
     """Windows consoles default to cp1252; our output is UTF-8."""
@@ -70,12 +71,65 @@ RULES = [
     ('secrets', '密钥：sk- / ghp_ / AKIA / 私钥 / 长十六进制 / 明文口令'),
     ('email', '真实邮箱；example.com 与 localhost 放行 / real emails, examples allowed'),
     ('paths', '本机绝对路径 → 警告，不阻断 / local absolute paths → warning'),
+    ('links', '图片必须存在（报错），相对链接必须存在（警告）/ dead images fail, dead links warn'),
     ('todo', '残留 TODO: / FIXME:'),
 ]
 
 EMAIL = re.compile(r'[\w.+-]+@[\w-]+\.[A-Za-z]{2,}')
 EMAIL_OK = ('example.com', 'example.org', 'users.noreply.github.com', 'localhost')
 HOME = re.compile(r'/(?:Users|home)/[A-Za-z0-9._-]+')
+
+# ![alt](path "title") 或 [text](path)
+LINK = re.compile(r'(!?)\[([^\]]*)\]\(\s*([^)\s]*)(?:\s+"[^"]*")?\s*\)')
+REMOTE = ('http://', 'https://', '//', '#', 'mailto:', 'tel:', 'data:', 'ftp://')
+
+
+def _is_remote(target):
+    return target.startswith(REMOTE)
+
+
+def check_links(text, root):
+    """Dead relative links. Only the ones we can resolve, so nothing is guessed.
+
+    Images are errors (they render as a broken box); plain links are warnings
+    (the target may live in a sibling repo). Fenced code is skipped.
+    """
+    found = []
+    if not root:
+        return found
+    base = os.path.abspath(root)
+    fenced = False
+    for i, line in enumerate(text.splitlines(), 1):
+        if line.lstrip().startswith('```'):
+            fenced = not fenced
+            continue
+        if fenced:
+            continue
+        for m in LINK.finditer(line):
+            bang, _alt, raw = m.groups()
+            target = unquote(raw.strip())
+            if not target or _is_remote(target):
+                continue
+            if any(c in target for c in '<>{}*|'):     # 模板占位符，不猜
+                continue
+            path = target.split('#')[0].split('?')[0]
+            if not path:
+                continue
+            full = os.path.normpath(os.path.join(base, path.lstrip('/')))
+            try:
+                if os.path.normcase(os.path.commonpath([base, full])) != os.path.normcase(base):
+                    continue          # 出了项目目录，不管
+            except ValueError:        # Windows 上跨盘符
+                continue
+            if os.path.exists(full):
+                continue
+            if bang:
+                found.append((i, 'error',
+                              f'图片不存在：{path}（推上去就是破图）'))
+            else:
+                found.append((i, 'warning',
+                              f'相对链接指向不存在的文件：{path}'))
+    return found
 
 
 def section_key(heading):
@@ -99,7 +153,7 @@ def actionable(item):
     return any(v in low for v in VERBS)
 
 
-def lint_text(text):
+def lint_text(text, root=None):
     lines = text.splitlines()
     problems = []   # (line, level, message)
     add = lambda n, lvl, msg: problems.append((n, lvl, msg))
@@ -183,6 +237,10 @@ def lint_text(text):
         if re.search(r'\b(TODO|FIXME|XXX)\s*[:：]', line):
             add(i, 'error', '文档里还留着 TODO/FIXME')
 
+    # 死链：图片断了自己先看见，链接断了下一个人踩空
+    for n, lvl, msg in check_links(text, root):
+        add(n, lvl, msg)
+
     return problems, len(lines)
 
 
@@ -214,7 +272,7 @@ def main():
         sys.exit(2)
 
     text = open(path, encoding='utf-8', errors='ignore').read()
-    problems, n_lines = lint_text(text)
+    problems, n_lines = lint_text(text, os.path.dirname(os.path.abspath(path)))
     errors = [p for p in problems if p[1] == 'error']
     warns = [p for p in problems if p[1] == 'warning']
     ok = not errors and (not warns or not strict)

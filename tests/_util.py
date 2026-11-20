@@ -40,8 +40,9 @@ class ProjectCase(unittest.TestCase):
     def write(self, rel, text):
         path = os.path.join(self.root, rel)
         os.makedirs(os.path.dirname(path) or self.root, exist_ok=True)
-        with open(path, 'w', encoding='utf-8') as fh:
-            fh.write(text)
+        mode, data = ('wb', text) if isinstance(text, bytes) else ('w', text)
+        with open(path, mode, **({} if mode == 'wb' else {'encoding': 'utf-8'})) as fh:
+            fh.write(data)
         return path
 
     def scan(self, *args):

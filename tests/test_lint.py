@@ -141,5 +141,41 @@ class LintCli(ProjectCase):
         self.assertEqual(run('lint.py', self.root, '--strict').returncode, 1)
 
 
+class LintLinks(ProjectCase):
+    """Rule 12: links must resolve. Images fail, plain links warn."""
+
+    def lint(self, extra):
+        self.write('PROGRESS.md', GOOD + extra)
+        return run('lint.py', self.root)
+
+    def test_dead_image_is_an_error(self):
+        out = self.lint('\n![demo](docs/missing.png)\n')
+        self.assertEqual(out.returncode, 1)
+        self.assertIn('图片不存在', out.stdout)
+
+    def test_live_image_passes(self):
+        self.write('docs/how-it-works.gif', b'GIF89a')
+        out = self.lint('\n![demo](docs/how-it-works.gif)\n')
+        self.assertEqual(out.returncode, 0, out.stdout)
+
+    def test_dead_link_warns_but_does_not_block(self):
+        out = self.lint('\n见 [部署说明](docs/deploy.md)\n')
+        self.assertEqual(out.returncode, 0, out.stdout)
+        self.assertIn('相对链接指向不存在', out.stdout)
+        self.assertEqual(run('lint.py', self.root, '--strict').returncode, 1)
+
+    def test_remote_and_anchor_links_are_ignored(self):
+        out = self.lint('\n[a](https://example.com/x.png) [b](#next) [c](mailto:a@example.com)\n')
+        self.assertEqual(out.returncode, 0, out.stdout)
+
+    def test_links_in_code_fences_are_ignored(self):
+        out = self.lint('\n```\n![demo](docs/missing.png)\n```\n')
+        self.assertEqual(out.returncode, 0, out.stdout)
+
+    def test_escaping_the_project_is_not_our_business(self):
+        out = self.lint('\n[repo](../elsewhere/README.md)\n')
+        self.assertEqual(out.returncode, 0, out.stdout)
+
+
 if __name__ == '__main__':
     unittest.main()

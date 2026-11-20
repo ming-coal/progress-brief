@@ -54,7 +54,7 @@ conversation. This one **looks at the repository** and does three things a promp
 | | A prompt / a chat summary | This |
 |---|---|---|
 | **Knows when not to bother** | always writes one | refuses under 15 files — measured: writing costs more than reading |
-| **Enforces its own rules** | rules are suggestions | `lint.py` fails on vague wording, missing sections, unactionable steps, leaked keys and real emails (`example.com` passes, so examples still work) |
+| **Enforces its own rules** | rules are suggestions | `lint.py` fails on vague wording, missing sections, unactionable steps, leaked keys, real emails and images that don't exist (`example.com` passes, so examples still work) |
 | **Proves the saving** | you guess | token ledger per run and cumulative, calibrated against a real tokenizer |
 | **Detects a stale doc** | nobody checks | compares doc mtime with real edits, exit code 1 |
 | **Says restart** | out of scope | the only part a document can't do |
@@ -156,7 +156,9 @@ the repo side: what actually changed, what's stale, and whether the window is wo
 
 - Without `tiktoken` the token count is an estimate; the ledger counts runs, not handoffs.
 - `doctor.py` reads the project, not your context window. The "should I compact" signals are rules, not a sensor.
-- `lint.py` checks form, not truth. It cannot tell that a `✅` is a lie.
+- `lint.py` checks form, not truth. It cannot tell that a `✅` is a lie. Its link rule
+  only resolves paths written as links and living inside the project — a path in
+  backticks may be a file you haven't written yet.
 - Chinese docs: [README.zh-CN.md](README.zh-CN.md).
 
 MIT licensed. See [CHANGELOG.md](CHANGELOG.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
