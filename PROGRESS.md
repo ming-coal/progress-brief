@@ -25,12 +25,12 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 | 4 | public repo + release | GitHub `v0.1.1` | ✅ done |
 | 5 | first traffic | — | ⬜ 0 stars, 0 visits |
 | 6 | awesome-list listing | blocked on stars | ⛔ needs 10 / 25 stars |
-| 7 | demo video | — | ⛔ dropped: `docs/how-it-works.gif` already shows fail → fix → pass |
+| 7 | demo video | — | ⛔ dropped: the README figure says it in one screen |
 
 ## Where things live
 - docs: `README.md` (EN), `README.zh-CN.md`, `SKILL.md`, `docs/launch.md`
 - code: `scripts/`, tests in `tests/`
-- images: `docs/how-it-works.gif` (README demo), `docs/handoff-card.png`, `docs/handoff-card.zh-CN.png`
+- images: `docs/how-it-works.png` (README figure, 1280×640, also the social preview), `docs/handoff-card.png`, `docs/handoff-card.zh-CN.png`
 
 ## Decisions
 | topic | choice | why |
@@ -39,7 +39,7 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 | runtime | stdlib only, `tiktoken` optional | install must never fail on a missing dependency |
 | claims | publish the small-repo number too | 99% only holds for big repos; hiding that invites a takedown |
 | registry | `npx skills add ming-coal/progress-brief` | the standard CLI resolves any repo with `SKILL.md` at root |
-| demo form | 3-frame gif, no talking-head video | the gif shows the same fail → fix → pass in 7 seconds; a video buys nothing before there is traffic |
+| demo form | one static 1280×640 figure | the 3-frame gif showed one small terminal per frame with half the canvas empty; side by side says what it writes and what it catches in one look |
 | name | keep `progress-brief`, always install by owner/repo | renaming loses the only searchable term; collision is already handled by the qualified install line |
 
 ## Pitfalls
@@ -48,7 +48,8 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 3. `ubuntu-latest` dropped Python 3.9 → matrix moved to 3.10/3.12/3.13
 4. skills.sh search lists a different skill named `progress-brief` → always install by owner/repo
 5. Windows `tempfile` returns an 8.3 short path (`RUNNER~1`) → compare `Path.resolve()` output, never the raw string
-6. This doc itself went stale (61 tests, a `docs/demo.png` that had been renamed) → `lint.py` missed it because the path sat in backticks, not in a link; rule 12 now covers links, not prose paths
+6. This doc itself went stale (61 tests, a `docs/demo.png` that had been renamed) → `lint.py` missed it because the path sat in backticks, not in a link; rule 11 now covers links, not prose paths
+7. An animated demo lost to a static one → each gif frame held a single small panel with half the canvas empty; motion only pays when each frame carries a full screen
 
 ## Next
 1. post once on X and 即刻 using the copy in `docs/launch.md`

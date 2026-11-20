@@ -5,7 +5,7 @@
 
 [![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
 
-![lint 打回糊弄的文档，改完通过](docs/how-it-works.gif)
+![左边是它写出来的 PROGRESS.md，右边是 lint.py 和 doctor.py 挑出的问题。](docs/how-it-works.png)
 
 ## 安装
 

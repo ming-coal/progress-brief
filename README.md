@@ -6,7 +6,7 @@ restart the conversation instead of pushing on.
 
 [![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
 
-![lint rejects a vague doc, then it passes](docs/how-it-works.gif)
+![Left: the PROGRESS.md it writes. Right: what lint.py and doctor.py catch.](docs/how-it-works.png)
 
 ## Install
 
