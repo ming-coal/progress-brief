@@ -5,7 +5,7 @@
 
 [![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
 
-![progress-brief 状态卡](docs/handoff-card.zh-CN.png)
+![文档没过 lint，改完通过](docs/demo.png)
 
 不绑某一个工具。本质是一份 markdown 规则 + 几个纯 Python 3.10+ 脚本，
 **只要 agent 能执行 shell 命令就能用**。

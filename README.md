@@ -6,7 +6,7 @@ restart the conversation instead of pushing on.
 
 [![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
 
-![progress-brief status card](docs/handoff-card.png)
+![The doc fails lint, gets fixed, passes](docs/demo.png)
 
 Not tied to one agent. The skill is markdown plus plain Python 3.10+ scripts; it works
 anywhere an agent can run a shell command.
