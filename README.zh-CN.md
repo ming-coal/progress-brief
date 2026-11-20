@@ -49,7 +49,7 @@ python3 progress-brief/scripts/install.py
 | | 提示词 / 聊天总结 | 这个 |
 |---|---|---|
 | **知道什么时候不该写** | 无论如何都写 | 少于 15 个文件会拒绝——实测写了比直接读还贵 |
-| **自己守规则** | 规则只是建议 | `lint.py` 对模糊表述、缺小节、不可执行的下一步、泄露的密钥直接判失败 |
+| **自己守规则** | 规则只是建议 | `lint.py` 对模糊表述、缺小节、不可执行的下一步、泄露的密钥和真实邮箱直接判失败（`example.com` 放行，方便写示例） |
 | **能证明省了多少** | 靠猜 | token 账本，单次和累计，用真 tokenizer 校准过 |
 | **能发现文档过期了** | 没人检查 | 比对文档时间和真实改动，退出码 1 |
 | **会告诉你该重开** | 不管 | 只有它能做 |
@@ -132,7 +132,7 @@ python scripts/scan.py   . --json     # 机器可读指标
 | `SKILL.md` | 给 agent 的规则（写作规范、窗口卫生信号） |
 | `scripts/scan.py` | 项目画像 + token 账本（`--json`、`--no-ledger`） |
 | `scripts/doctor.py` | 继续 / 更新 / 重开（`--json`，退出码 0/1/2） |
-| `scripts/lint.py` | 文档体检（`--json`、`--strict`） |
+| `scripts/lint.py` | 文档体检（`--rules` 看规则清单、`--json`、`--strict`） |
 | `scripts/card.py` | JSON → HTML + PNG（自动找 Chrome/Chromium/Edge） |
 | `scripts/calibrate.py` | 用 `tiktoken` 重新拟合估算系数 |
 | `scripts/install.py` | 安装（`--target`、`--dest`、`--agents-md`、`--prompt`） |

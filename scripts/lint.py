@@ -60,6 +60,19 @@ SECRET_PATTERNS = [
     (re.compile(r'\b[0-9a-f]{32,}\b'), '长十六进制串（可能是密钥）'),
     (re.compile(r'\b(?:password|passwd|secret|token)\s*[:=]\s*\S{8,}', re.I), '明文口令'),
 ]
+RULES = [
+    ('length', '文件 ≤ 120 行 / at most 120 lines'),
+    ('sections', '小节齐全且顺序固定 / required sections, fixed order'),
+    ('date', '状态行必须有绝对日期 / absolute date in the status line'),
+    ('vague', '模糊表述黑名单 / vague wording: 基本完成, 差不多, basically done …'),
+    ('states', '进度表状态只能是 ✅ 🟡 ⬜ ⛔ / allowed state markers only'),
+    ('next', '下一步 ≤5 条，每条要可执行 / max 5 actionable steps'),
+    ('secrets', '密钥：sk- / ghp_ / AKIA / 私钥 / 长十六进制 / 明文口令'),
+    ('email', '真实邮箱；example.com 与 localhost 放行 / real emails, examples allowed'),
+    ('paths', '本机绝对路径 → 警告，不阻断 / local absolute paths → warning'),
+    ('todo', '残留 TODO: / FIXME:'),
+]
+
 EMAIL = re.compile(r'[\w.+-]+@[\w-]+\.[A-Za-z]{2,}')
 EMAIL_OK = ('example.com', 'example.org', 'users.noreply.github.com', 'localhost')
 HOME = re.compile(r'/(?:Users|home)/[A-Za-z0-9._-]+')
@@ -178,6 +191,14 @@ def main():
     args = [a for a in sys.argv[1:] if not a.startswith('-')]
     as_json = '--json' in sys.argv
     strict = '--strict' in sys.argv
+
+    if '--rules' in sys.argv:
+        print('lint.py rules:')
+        for i, (key, desc) in enumerate(RULES, 1):
+            print(f'  {i:>2}. {key:<9} {desc}')
+        print('\nexample.com and localhost are allowed so documents can show examples.')
+        print('local absolute paths are warnings; add --strict to make them fail.')
+        return
     target = args[0] if args else '.'
 
     if os.path.isdir(target):

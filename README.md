@@ -51,7 +51,7 @@ conversation. This one **looks at the repository** and does three things a promp
 | | A prompt / a chat summary | This |
 |---|---|---|
 | **Knows when not to bother** | always writes one | refuses under 15 files — measured: writing costs more than reading |
-| **Enforces its own rules** | rules are suggestions | `lint.py` fails on vague wording, missing sections, unactionable steps, leaked keys |
+| **Enforces its own rules** | rules are suggestions | `lint.py` fails on vague wording, missing sections, unactionable steps, leaked keys and real emails (`example.com` passes, so examples still work) |
 | **Proves the saving** | you guess | token ledger per run and cumulative, calibrated against a real tokenizer |
 | **Detects a stale doc** | nobody checks | compares doc mtime with real edits, exit code 1 |
 | **Says restart** | out of scope | the only part a document can't do |
@@ -143,7 +143,7 @@ the repo side: what actually changed, what's stale, and whether the window is wo
 | `SKILL.md` | instructions for the agent (rules, template, hygiene signals) |
 | `scripts/scan.py` | project digest + token ledger (`--json`, `--no-ledger`) |
 | `scripts/doctor.py` | continue / update / restart (`--json`, exit 0/1/2) |
-| `scripts/lint.py` | rule check on the doc (`--json`, `--strict`) |
+| `scripts/lint.py` | rule check on the doc (`--rules` to list them, `--json`, `--strict`) |
 | `scripts/card.py` | JSON → HTML + PNG (auto-finds Chrome/Chromium/Edge) |
 | `scripts/calibrate.py` | re-fit the token estimate against `tiktoken` |
 | `scripts/install.py` | installer (`--target`, `--dest`, `--agents-md`, `--prompt`) |

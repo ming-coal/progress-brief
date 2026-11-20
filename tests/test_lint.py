@@ -124,6 +124,17 @@ class LintCli(ProjectCase):
         self.assertEqual(data['errors'], 0)
         self.assertIn('lines', data)
 
+    def test_rules_can_be_listed(self):
+        out = run('lint.py', '--rules')
+        self.assertEqual(out.returncode, 0)
+        for needle in ('length', 'sections', 'email', 'secrets', 'paths'):
+            self.assertIn(needle, out.stdout)
+
+    def test_example_email_is_allowed_by_design(self):
+        self.write('PROGRESS.md', GOOD + '\ncontact demo@example.com\n')
+        out = run('lint.py', self.root)
+        self.assertEqual(out.returncode, 0)
+
     def test_strict_turns_warnings_into_failure(self):
         self.write('PROGRESS.md', GOOD + '\n见 /Users/someone/proj\n')
         self.assertEqual(run('lint.py', self.root).returncode, 0)

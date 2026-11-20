@@ -184,6 +184,8 @@ def main():
         written = write_agents_md(agents_md, resolved)
         print(f'wired   : {written}  (block is idempotent, safe to re-run)')
 
+    print('\nnote: skills are loaded when the agent starts — restart the session,')
+    print('      then the skill shows up in its list.')
     print('\n验证：')
     print(f'  python3 "{resolved / "scripts" / "scan.py"}" . --no-ledger')
     if not agents_md:

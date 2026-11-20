@@ -111,7 +111,8 @@ python3 "$SKILL_DIR/scripts/lint.py" <path>
 
 It checks the rules this skill keeps preaching: ≤120 lines, sections present and in order,
 absolute date, no vague words ("basically done", "继续完善"), every next step actionable,
-allowed state markers, and no leaked keys / real emails / local absolute paths.
+allowed state markers, leaked keys, real email addresses (`example.com` and `localhost` are
+allowed on purpose, so examples can be written) and local absolute paths (warning only).
 Fix what it reports, then rerun until `✓`.
 
 ### 4. Status card (optional)
