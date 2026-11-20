@@ -10,6 +10,8 @@
   `tests/test_no_cjk.py` fails if Chinese shows up anywhere else in the code.
 - CJK samples in tests are written as `\u4e2d` escapes, so the test files stay ASCII.
 - 76 tests, up from 73. Docs quoting the CLI output were updated to the new format.
+- `tests/test_tiers.py` no longer pins the small-repo saving to one number: the count
+  includes file paths, so the same fixture reads 71% on Windows and 68% on macOS.
 
 ## 0.1.1 — 2026-11-20
 

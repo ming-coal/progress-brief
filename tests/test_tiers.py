@@ -71,8 +71,13 @@ class Tiers(ProjectCase):
         self.build(28)
         self.write('PROGRESS.md', LANDING.format(name='small'))
         out = self.scan().stdout
-        self.assertIsNotNone(saving(out))
-        self.assertLess(saving(out), 70)
+        value = saving(out)
+        self.assertIsNotNone(value)
+        # The same fixture reads 71% on Windows and 68% on macOS: the token count
+        # includes file paths, so the number moves with the OS. The claim here is
+        # "a small repo saves far less than a large one", not a fixed percentage.
+        self.assertGreaterEqual(value, 40)
+        self.assertLess(value, 80)
 
     def test_large_is_big(self):
         self.build(180, n_docs=8, body=90)
