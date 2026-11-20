@@ -1,11 +1,11 @@
 {
-  "kicker": "PROGRESS-BRIEF · HANDOFF",
-  "title": "下一个窗口，30 秒接手",
-  "highlight": ["30 秒"],
-  "status": "v0.1 · 55 tests",
-  "stats": [{"k": "交接成本", "v": "≈ 700 tok"}, {"k": "文档上限", "v": "120 行"}],
-  "done": ["扫一遍项目", "写出 PROGRESS.md", "规则体检", "判断该不该重开"],
-  "next": ["开源", "做一期视频", "收第一批反馈"],
-  "foot": "examples/PROGRESS.md",
+  "kicker": "PROGRESS-BRIEF · OPEN SOURCE",
+  "title": "The 30-second handoff",
+  "highlight": ["30-second"],
+  "status": "v0.1 · 55 tests · MIT",
+  "stats": [{"k": "handoff cost", "v": "≈ 700 tok"}, {"k": "doc ceiling", "v": "120 lines"}],
+  "done": ["reads the repo", "writes PROGRESS.md", "lints the doc", "says when to restart"],
+  "next": ["first feedback", "a video", "more skills"],
+  "foot": "github.com/ming-coal/progress-brief",
   "mark": "v0.1"
 }
