@@ -3,6 +3,7 @@
 import os
 import sys
 import unittest
+from pathlib import Path
 
 from _util import ROOT, SCRIPTS, ProjectCase, run
 
@@ -79,7 +80,8 @@ class UniversalPrompt(ProjectCase):
         run('install.py', '--dest', dest, '--agents-md', target)
         text = open(target, encoding='utf-8').read()
         self.assertIn('progress-brief:start', text)
-        self.assertIn(dest, text)
+        # Windows gives tempfile a 8.3 short path (RUNNER~1); install.py resolves it
+        self.assertIn(str(Path(dest).resolve()), text)
         self.assertIn('lint.py', text)
 
     def test_agents_md_rerun_does_not_duplicate(self):
@@ -110,7 +112,6 @@ class UniversalPrompt(ProjectCase):
 
 class Platform(unittest.TestCase):
     def test_windows_uses_appdata(self):
-        from pathlib import Path
         real_name, real_path = os.name, install.Path
         install.Path = type(Path('/'))
         os.environ['APPDATA'] = '/tmp/fake-appdata'
