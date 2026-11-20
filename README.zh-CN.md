@@ -25,7 +25,7 @@ python3 progress-brief/scripts/install.py
 | 你的工具 | 接入方式 |
 |---|---|
 | **OpenCode · Claude Code · Cursor · Codex · Gemini CLI · Windsurf · Cline · Copilot** | `npx skills add ming-coal/progress-brief`（`-g` 装到用户级，`--agent claude-code` 只装一个） |
-| **没有这个 CLI** | `python3 install.py --target opencode\|claude`，或 `--dest <任意目录>` |
+| **没有这个 CLI** | `python3 install.py --target opencode  (or claude)`，或 `--dest <任意目录>` |
 | **只读规则文件的 agent** | `python3 install.py --agents-md AGENTS.md`（也可 `GEMINI.md`、`.cursor/rules/...`） |
 | **聊天界面** | `python3 install.py --prompt` 打印一段可粘贴的规则 |
 

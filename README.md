@@ -26,7 +26,7 @@ python3 progress-brief/scripts/install.py
 | your tool | how it gets wired |
 |---|---|
 | **OpenCode · Claude Code · Cursor · Codex · Gemini CLI · Windsurf · Cline · Copilot** | `npx skills add ming-coal/progress-brief` (add `-g` for user-level, `--agent claude-code` to target one) |
-| **anything without the CLI** | `python3 install.py --target opencode\|claude`, or `--dest <dir>` for any folder |
+| **anything without the CLI** | `python3 install.py --target opencode  (or claude)`, or `--dest <dir>` for any folder |
 | **agents that only read a rules file** | `python3 install.py --agents-md AGENTS.md` (also `GEMINI.md`, `.cursor/rules/...`) |
 | **chat UIs** | `python3 install.py --prompt` prints a paste-ready block |
 
