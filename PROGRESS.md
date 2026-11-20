@@ -1,6 +1,6 @@
 # progress-brief
 
-> Status: **v0.1 shipped, waiting for the first real users** · updated 2026-11-20
+> Status: **v0.1 shipped, CI green on 3 OS, waiting for the first users** · updated 2026-11-20
 
 ## One-liner
 A handoff skill that reads the repo instead of the chat. Scans a project, writes a
@@ -45,6 +45,7 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 2. GitHub caches images by URL → replacing a PNG needs a new filename
 3. `ubuntu-latest` dropped Python 3.9 → matrix moved to 3.10/3.12/3.13
 4. skills.sh search lists a different skill named `progress-brief` → always install by owner/repo
+5. Windows `tempfile` returns an 8.3 short path (`RUNNER~1`) → compare `Path.resolve()` output, never the raw string
 
 ## Next
 1. post once on X and 即刻 using the copy in `docs/launch.md`
