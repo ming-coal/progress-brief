@@ -135,7 +135,7 @@ python scripts/scan.py   . --json     # 机器可读指标
 | `scripts/lint.py` | 文档体检（`--json`、`--strict`） |
 | `scripts/card.py` | JSON → HTML + PNG（自动找 Chrome/Chromium/Edge） |
 | `scripts/calibrate.py` | 用 `tiktoken` 重新拟合估算系数 |
-| `scripts/install.py` | 安装（`--target opencode\|claude`、`--project`） |
+| `scripts/install.py` | 安装（`--target`、`--dest`、`--agents-md`、`--prompt`） |
 | `tests/` | 55 个标准库测试，CI 覆盖 3 系统 × 2 个 Python 版本 |
 
 ## 诚实的边界
