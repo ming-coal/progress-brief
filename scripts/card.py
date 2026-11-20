@@ -6,12 +6,12 @@ Usage:
 
 JSON:
   {
-    "title": "EP.002 · 一个人把产品做到上线",
+    "title": "EP.002 · One person, product to launch",
     "kicker": "VIDEO PRODUCTION",
-    "status": "制作中 · 5/7 镜头",
-    "stats": [{"k": "镜头", "v": "5 / 7"}, {"k": "规格", "v": "1080×1920"}],
-    "done": ["文档", "GitHub", "产品录屏"],
-    "next": ["九步地图", "小结", "口播"],
+    "status": "in progress · 5/7 shots",
+    "stats": [{"k": "shots", "v": "5 / 7"}, {"k": "format", "v": "1080x1920"}],
+    "done": ["docs", "GitHub", "screen recording"],
+    "next": ["nine-step map", "summary", "voice-over"],
     "foot": "episodes/002-invoice2sheet"
   }
 """
@@ -32,7 +32,7 @@ def _utf8_stdio():
 
 
 
-# 按平台找浏览器：Chrome / Chromium / Edge / Brave，找不到就只出 HTML
+# Find a browser per platform; if none is found, only the HTML is written
 CHROME_NAMES = [
     'google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser',
     'microsoft-edge', 'microsoft-edge-stable', 'brave-browser', 'chrome',
@@ -135,7 +135,7 @@ def build(data):
     status = esc(data.get('status', ''))
     status = f'<div class="status">{status}</div>' if status else ''
     title = esc(data.get('title', ''))
-    # 按字宽估算自动缩字号（中文 1em / 英文 0.55em），避免卡片里折行
+    # Shrink the title by estimated width (cjk 1em, latin 0.55em) so it does not wrap
     raw = data.get('title', '')
     w = sum(1.0 if ord(c) > 0x2E80 else 0.55 for c in raw)
     fs = max(36, min(74, int(860 / max(w, 1))))
@@ -163,9 +163,9 @@ def main():
         with open(src, encoding='utf-8') as fh:
             data = json.load(fh)
     except FileNotFoundError:
-        sys.exit(f'找不到 {src}')
+        sys.exit(f'not found: {src}')
     except ValueError as e:
-        sys.exit(f'{src} 不是合法 JSON：{e}')
+        sys.exit(f'{src} is not valid JSON: {e}')
     html = build(data)
     html_path = src.rsplit('.', 1)[0] + '.html'
     png_path = src.rsplit('.', 1)[0] + '.png'

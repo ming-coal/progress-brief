@@ -45,8 +45,9 @@ BULK_NAME = {
 }
 DOC_NAME = ('readme', 'agents.md', 'claude.md', 'contributing.md')
 HUMAN = [[1 << 30, 'GB'], [1 << 20, 'MB'], [1 << 10, 'KB']]
-# 我们自己生成的表格文本（路径+数字+缩进）比同字数的散文贵约 38%；
-# 这个系数只用于 brief 自身，用 tiktoken 时不生效。
+# The table text we generate (paths + numbers + indentation) costs about 38%
+# more than prose of the same length. The factor applies only to the brief
+# itself and is skipped when tiktoken is available.
 BRIEF_TEXT_FACTOR = 1.38
 
 LEDGER = Path(os.environ.get('PROGRESS_BRIEF_LEDGER')
@@ -202,7 +203,7 @@ def main():
     add(f'# SCAN {root}')
     add(f'files: {len(files)}  size: {human(total)}')
 
-    # 一级目录
+    # top-level directories
     per_dir = {}
     for p, s, _ in files:
         rel = os.path.relpath(p, root)
@@ -215,7 +216,7 @@ def main():
     for name, (n, s) in sorted(per_dir.items(), key=lambda kv: -kv[1][1])[:12]:
         add(f'  {name:<28} {n:>5} files  {human(s)}')
 
-    # 最近改动
+    # recent changes
     add('')
     add(f'## changed in {days}d')
     recent = sorted(files, key=lambda f: -f[2])[:12]
@@ -225,7 +226,7 @@ def main():
         stamp = time.strftime('%m-%d %H:%M', time.localtime(m))
         add(f'  {stamp}  {human(s):>7}  {os.path.relpath(p, root)}')
 
-    # 进度文档
+    # progress docs
     add('')
     add('## progress docs')
     found = False
@@ -240,7 +241,7 @@ def main():
     if not found:
         add('  (none)')
 
-    # TODO 计数
+    # TODO count
     todos = []
     for p, _, _ in files:
         if not text_key(p) or os.path.getsize(p) > 400_000:
@@ -285,7 +286,7 @@ def main():
         except Exception:
             pass
 
-    # ---- token 账本 ----
+    # ---- token ledger ----
     texts = [p for p, _, _ in files if text_key(p)]
     srcs = [p for p in texts if is_source(p)]
     docs = [p for p in texts if is_doc(p)]
@@ -301,7 +302,7 @@ def main():
     brief_lines = count('\n'.join(lines))
     if backend != 'tiktoken':
         brief_lines *= BRIEF_TEXT_FACTOR
-    brief_lines += 150                              # 账本块自身
+    brief_lines += 150                              # the ledger block itself
     progress_tok = 0.0
     for p, s, _ in files:
         if os.path.basename(p).upper().startswith('PROGRESS'):
@@ -313,21 +314,22 @@ def main():
 
     if len(texts) < 15:
         add('')
-        add(f'## note  项目只有 {len(texts)} 个文本文件，直接读 README 更快，PROGRESS.md 可省')
+        add(f'## note  only {len(texts)} text files — reading the README is cheaper, skip PROGRESS.md')
 
     add('')
-    label = '精确' if backend == 'tiktoken' else '估算 ±20%'
-    add(f'## token 账本（{label}）')
-    add(f'  最坏  通读全部文本        {len(texts):>4} 文件  ≈ {tok(worst)} tok')
-    add(f'  典型  根文档 + 20 个源文件 {len(set(typical_set)):>4} 文件  ≈ {tok(typical)} tok')
-    add(f'  brief scan 输出 + PROGRESS.md            ≈ {tok(brief)} tok')
+    label = 'exact' if backend == 'tiktoken' else 'estimated, ±20%'
+    add(f'## token ledger ({label})')
+    add(f'  worst    every text file      {len(texts):>4} files  ~ {tok(worst)} tok')
+    add(f'  typical  root docs + 20 src   {len(set(typical_set)):>4} files  ~ {tok(typical)} tok')
+    add(f'  brief    scan output + PROGRESS.md             ~ {tok(brief)} tok')
     if typical > 0 and brief >= typical:
-        add(f'  → 这个项目太小：写文档比直接读还贵（约 +{tok(brief - typical)} tok），可以不写')
+        add(f'  -> project too small: writing the doc costs more than reading it'
+            f' (+{tok(brief - typical)} tok), you can skip it')
     elif typical > 0:
         gain = 100 * (1 - brief / typical)
-        tail = '  ·  项目偏小，收益一般' if gain < 30 else ''
-        add(f'  → 比典型省 {gain:.0f}%'
-            f'  ·  比最坏省 {100 * (1 - brief / worst):.0f}%{tail}')
+        tail = '  ·  small project, modest gain' if gain < 30 else ''
+        add(f'  -> {gain:.0f}% cheaper than typical'
+            f'  ·  {100 * (1 - brief / worst):.0f}% cheaper than worst case{tail}')
 
     if not as_json and not no_ledger:
         rows = read_ledger()
@@ -346,9 +348,9 @@ def main():
             saved = sum(max(0, r.get('typical', 0) - r.get('brief', 0)) for r in rows)
             saved += max(0, typical - brief)
             if saved < 100:
-                add(f'  累计 {len(rows) + 1} 次运行  ·  这些项目都没省下什么')
+                add(f'  {len(rows) + 1} runs so far  ·  nothing saved on these projects yet')
             else:
-                add(f'  累计 {len(rows) + 1} 次运行  ≈ 省 {tok(saved)} tok')
+                add(f'  {len(rows) + 1} runs so far  ~ {tok(saved)} tok saved')
 
     if as_json:
         print(json.dumps({

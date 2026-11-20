@@ -82,11 +82,11 @@ A ~50 line project digest (not your source code):
 ```
 files: 226  size: 2.6MB
 ## top level / changed in 7d / progress docs / todos / git / scripts
-## token ledger
-  worst    read every text file     210 files  ~289k tok
-  typical  docs + 20 largest files   22 files   ~66k tok
-  brief    scan output + PROGRESS.md             ~843 tok
-  => 99% less than typical
+## token ledger (estimated, +/-20%)
+  worst    every text file     210 files  ~ 289k tok
+  typical  root docs + 20 src   22 files  ~ 66k tok
+  brief    scan output + PROGRESS.md       ~ 843 tok
+  -> 99% cheaper than typical  ·  99% cheaper than worst case
 ```
 
 A `PROGRESS.md` under 120 lines ([example](examples/PROGRESS.md)), a lint pass over it,

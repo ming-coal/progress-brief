@@ -186,12 +186,12 @@ def main():
 
     print('\nnote: skills are loaded when the agent starts — restart the session,')
     print('      then the skill shows up in its list.')
-    print('\n验证：')
+    print('\ncheck it:')
     print(f'  python3 "{resolved / "scripts" / "scan.py"}" . --no-ledger')
     if not agents_md:
-        print('\n然后在会话里说：「给这个目录写个进度文档」')
+        print('\nthen say in the session: "write a progress doc for this folder"')
     if project:
-        print('提示：项目级技能需要在该项目目录下开会话才会生效。')
+        print('note: a project-level skill only loads in a session started inside that project.')
 
 
 if __name__ == '__main__':

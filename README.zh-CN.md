@@ -76,10 +76,11 @@ python3 progress-brief/scripts/install.py
 ```
 files: 226  size: 2.6MB
 ## top level / changed in 7d / progress docs / todos / git / scripts
-## token 账本
-  最坏  通读全部文本   210 文件  ≈ 289k tok
-  典型  文档+20 个源文件 22 文件  ≈ 66k tok
-  brief 这次只花                ≈ 843 tok
+## token ledger (estimated, +/-20%)
+  worst    every text file     210 files  ~ 289k tok
+  typical  root docs + 20 src   22 files  ~ 66k tok
+  brief    scan output + PROGRESS.md       ~ 843 tok
+  -> 99% cheaper than typical  ·  99% cheaper than worst case
 ```
 
 一份 ≤120 行的 [PROGRESS.md 示例](examples/PROGRESS.md)、一次 lint 检查，

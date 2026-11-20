@@ -4,7 +4,7 @@
 Only useful when `tiktoken` is installed; it is a development tool.
 
   python3 scripts/calibrate.py <dir> [<dir> ...]
-  python3 scripts/calibrate.py --fit <dir>      # 最小二乘拟合 a、b
+  python3 scripts/calibrate.py --fit <dir>      # least-squares fit for a, b
 
 The heuristic counts  t = a*cjk + b*other  and the scanner applies it to a
 sampled bytes-per-token ratio, so this prints both the fitted constants and
@@ -72,7 +72,7 @@ def main():
     try:
         import tiktoken
     except ImportError:
-        sys.exit('需要 tiktoken：pip install tiktoken')
+        sys.exit('this needs tiktoken: pip install tiktoken')
     enc = tiktoken.get_encoding('cl100k_base')
 
     args = [a for a in sys.argv[1:] if not a.startswith('-')] or ['.']
@@ -88,23 +88,23 @@ def main():
             errs.append(abs(heur - true) / true)
 
     if not rows:
-        sys.exit('没有可校准的文本文件')
+        sys.exit('no text files to calibrate on')
 
     errs.sort()
     n = len(errs)
-    print(f'files           {n}')
-    print(f'中位误差        {errs[n // 2] * 100:.1f}%')
-    print(f'p90 误差        {errs[int(n * 0.9)] * 100:.1f}%')
-    print(f'平均绝对误差    {sum(errs) / n * 100:.1f}%')
+    print(f'files                {n}')
+    print(f'median error         {errs[n // 2] * 100:.1f}%')
+    print(f'p90 error            {errs[int(n * 0.9)] * 100:.1f}%')
+    print(f'mean absolute error  {sum(errs) / n * 100:.1f}%')
 
     if do_fit:
         a, b = fit(rows)
-        print(f'\n拟合常数        a(cjk)={a:.4f}  b(ascii)={b:.4f}')
-        print(f'等价于          {1 / a:.2f} 字符/token（中文）  {1 / b:.2f} 字符/token（其余）')
+        print(f'\nfitted constants     a(cjk)={a:.4f}  b(ascii)={b:.4f}')
+        print(f'equivalent to        {1 / a:.2f} chars/token (cjk)  {1 / b:.2f} chars/token (rest)')
         fitted = [(abs(a * c + b * o - t) / t) for c, o, t in rows if t]
         fitted.sort()
-        print(f'拟合后中位误差  {fitted[len(fitted) // 2] * 100:.1f}%')
-        print(f'拟合后 p90      {fitted[int(len(fitted) * 0.9)] * 100:.1f}%')
+        print(f'median after fit     {fitted[len(fitted) // 2] * 100:.1f}%')
+        print(f'p90 after fit        {fitted[int(len(fitted) * 0.9)] * 100:.1f}%')
 
 
 if __name__ == '__main__':

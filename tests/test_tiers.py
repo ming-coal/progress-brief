@@ -13,42 +13,42 @@ from _util import ProjectCase
 
 LANDING = """# {name}
 
-> 状态：**进行中** · 更新 2026-11-20
+> Status: **in progress** · updated 2026-11-20
 
-## 一句话
-测试用项目。
+## One-liner
+A project used by the tests.
 
-## 成品 / 产出
-| 文件 | 规格 | 说明 |
+## Output
+| file | spec | note |
 |---|---|---|
 
-## 进度表
-| # | 事项 | 位置 | 状态 |
+## Progress
+| # | item | where | state |
 |---|---|---|---|
-| 1 | 骨架 | `src/` | ✅ 完成 |
+| 1 | skeleton | `src/` | ✅ done |
 
-## 文件在哪
-- 代码：`src/`
+## Where things live
+- code: `src/`
 
-## 关键决策
-| 事 | 结论 | 为什么 |
+## Decisions
+| topic | choice | why |
 |---|---|---|
-| 语言 | Python | 快 |
+| language | Python | fast |
 
-## 踩过的坑
-1. 无
+## Pitfalls
+1. none
 
-## 下一步
-1. 补 `src/a.py` 的错误处理
+## Next steps
+1. add error handling to `src/a.py`
 """
 
 
 def saving(stdout):
     """Pull the percentage out of the ledger line."""
-    line = [l for l in stdout.splitlines() if l.strip().startswith('→')]
+    line = [l for l in stdout.splitlines() if l.strip().startswith('->')]
     if not line:
         return None
-    m = re.search(r'比典型省\s*(-?\d+)%', line[0])
+    m = re.search(r'(-?\d+)% cheaper than typical', line[0])
     return int(m.group(1)) if m else None
 
 
@@ -64,7 +64,7 @@ class Tiers(ProjectCase):
         self.write('README.md', '# hi\n')
         self.write('a.py', 'print(1)\n')
         out = self.scan().stdout
-        self.assertIn('这个项目太小', out)
+        self.assertIn('project too small', out)
         self.assertIsNone(saving(out))
 
     def test_small_is_modest(self):

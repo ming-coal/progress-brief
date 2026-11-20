@@ -13,13 +13,15 @@ import scan  # noqa: E402
 
 class ScanUnit(unittest.TestCase):
     def test_est_tokens_english_and_cjk(self):
-        # 校准值：0.2510 tok/ASCII 字符，1.6876 tok/中文字
+        # Calibrated: 0.2510 tok per ASCII char, 1.6876 tok per CJK char.
+        # The CJK samples are escapes so this file stays ASCII.
         self.assertAlmostEqual(scan.est_tokens('a' * 400), 100, delta=4)
-        self.assertAlmostEqual(scan.est_tokens('中' * 60), 101, delta=5)
+        self.assertAlmostEqual(scan.est_tokens('\u4e2d' * 60), 101, delta=5)
 
     def test_est_tokens_is_additive(self):
-        a, b = scan.est_tokens('abc'), scan.est_tokens('中文')
-        self.assertAlmostEqual(scan.est_tokens('abc中文'), a + b, places=6)
+        cjk = '\u4e2d\u6587'
+        a, b = scan.est_tokens('abc'), scan.est_tokens(cjk)
+        self.assertAlmostEqual(scan.est_tokens('abc' + cjk), a + b, places=6)
 
     def test_brief_factor_only_applies_to_heuristic(self):
         self.assertGreater(scan.BRIEF_TEXT_FACTOR, 1.0)
@@ -42,9 +44,9 @@ class ScanCli(ProjectCase):
         self.write('README.md', '# hi\n')
         self.write('a.py', 'print(1)\n')
         out = self.scan().stdout
-        self.assertIn('直接读 README 更快', out)
-        self.assertIn('写文档比直接读还贵', out)
-        self.assertNotIn('-', out.split('→')[1].split('tok')[0])
+        self.assertIn('reading the README is cheaper', out)
+        self.assertIn('writing the doc costs more than reading it', out)
+        self.assertNotIn('-', out.split('->')[1].split('tok')[0])
 
     def test_progress_doc_is_detected_with_age(self):
         self.write('src/a.py', 'x = 1\n')
@@ -70,7 +72,7 @@ class ScanCli(ProjectCase):
         first = run('scan.py', self.root, env=self.env)
         self.assertTrue(os.path.exists(self.ledger))
         second = run('scan.py', self.root, env=self.env)
-        self.assertIn('累计 2 次运行', second.stdout)
+        self.assertIn('2 runs so far', second.stdout)
         self.assertEqual(first.returncode, 0)
 
     def test_broken_ledger_line_is_ignored(self):
@@ -80,7 +82,7 @@ class ScanCli(ProjectCase):
             fh.write('not json{{\n')
         out = run('scan.py', self.root, env=self.env)
         self.assertEqual(out.returncode, 0)
-        self.assertIn('累计', out.stdout)
+        self.assertIn('runs so far', out.stdout)
 
     def test_empty_dir_does_not_crash(self):
         out = self.scan()

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.2 — 2026-11-20
+
+- **The scripts speak English.** Every printed message, docstring, comment and test
+  fixture is now English. The tool used to answer in Chinese while its README, commits
+  and issues were English — one language per conversation is easier to hand over.
+- The linter still reads Chinese documents. The keywords it needs (section headings,
+  vague wording, verbs, state synonyms) live in one marked block in `lint.py`, and
+  `tests/test_no_cjk.py` fails if Chinese shows up anywhere else in the code.
+- CJK samples in tests are written as `\u4e2d` escapes, so the test files stay ASCII.
+- 76 tests, up from 73. Docs quoting the CLI output were updated to the new format.
+
 ## 0.1.1 — 2026-11-20
 
 - `lint.py` — an eleventh rule: relative links must resolve. A missing **image** is an
@@ -9,7 +20,7 @@
 - `tests/test_rules.py` — the "N rules" number in `PROGRESS.md` is now asserted against
   `lint.RULES`. 0.1.0 shipped a count that was one too high; this release makes the
   sentence true instead of fixing the sentence.
-- 73 tests, up from 55. The new rule was written after this repo's own `PROGRESS.md`
+- 76 tests, up from 55. The new rule was written after this repo's own `PROGRESS.md`
   pointed at an image that had been renamed two commits earlier.
 
 ## 0.1.0 — 2026-11-20

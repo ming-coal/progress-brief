@@ -13,6 +13,7 @@ import re
 import sys
 from urllib.parse import unquote
 
+
 def _utf8_stdio():
     """Windows consoles default to cp1252; our output is UTF-8."""
     for stream in (sys.stdout, sys.stderr):
@@ -22,12 +23,16 @@ def _utf8_stdio():
             pass
 
 
-
 MAX_LINES = 120
 MAX_NEXT = 5
 STATES = ('✅', '🟡', '⬜', '⛔')
 
-# 标题：中英都认，顺序固定
+# --- bilingual vocabulary (data, not prose) --------------------------------
+# The only non-ASCII in this file. It is what lets the linter read a Chinese
+# document and an English one with the same code. tests/test_no_cjk.py allows
+# Chinese here and nowhere else, comments included.
+
+# Headings: both languages, order fixed.
 SECTIONS = [
     ('one_liner', ('一句话', 'one-liner', 'one liner', 'summary')),
     ('output', ('成品', '产出', 'output', 'deliverables')),
@@ -53,33 +58,40 @@ VERBS = (
     'wire', 'persist', 'build', 'split', 'refactor', 'polish', 'instrument',
 )
 
+HEADER_CELLS = ('状态', 'state', 'status', '')
+STATE_SYNONYMS = re.compile(r'完成|进行|待做|阻塞|done|wip|todo|block', re.I)
+# "1." and "1、" both start a numbered item; the full-width colon ends TODO:
+NUMBERED = re.compile(r'\s*\d+[.、)]\s+')
+TODO_MARK = re.compile(r'\b(TODO|FIXME|XXX)\s*[:：]')
+# --- end bilingual vocabulary ----------------------------------------------
+
 SECRET_PATTERNS = [
-    (re.compile(r'\bsk-[A-Za-z0-9_-]{16,}'), 'OpenAI 风格密钥'),
+    (re.compile(r'\bsk-[A-Za-z0-9_-]{16,}'), 'OpenAI-style key'),
     (re.compile(r'\bAKIA[0-9A-Z]{16}\b'), 'AWS access key'),
     (re.compile(r'\bgh[pousr]_[A-Za-z0-9]{20,}'), 'GitHub token'),
-    (re.compile(r'-----BEGIN [A-Z ]*PRIVATE KEY-----'), '私钥'),
-    (re.compile(r'\b[0-9a-f]{32,}\b'), '长十六进制串（可能是密钥）'),
-    (re.compile(r'\b(?:password|passwd|secret|token)\s*[:=]\s*\S{8,}', re.I), '明文口令'),
+    (re.compile(r'-----BEGIN [A-Z ]*PRIVATE KEY-----'), 'private key'),
+    (re.compile(r'\b[0-9a-f]{32,}\b'), 'long hex string (possibly a key)'),
+    (re.compile(r'\b(?:password|passwd|secret|token)\s*[:=]\s*\S{8,}', re.I), 'plaintext password'),
 ]
 RULES = [
-    ('length', '文件 ≤ 120 行 / at most 120 lines'),
-    ('sections', '小节齐全且顺序固定 / required sections, fixed order'),
-    ('date', '状态行必须有绝对日期 / absolute date in the status line'),
-    ('vague', '模糊表述黑名单 / vague wording: 基本完成, 差不多, basically done …'),
-    ('states', '进度表状态只能是 ✅ 🟡 ⬜ ⛔ / allowed state markers only'),
-    ('next', '下一步 ≤5 条，每条要可执行 / max 5 actionable steps'),
-    ('secrets', '密钥：sk- / ghp_ / AKIA / 私钥 / 长十六进制 / 明文口令'),
-    ('email', '真实邮箱；example.com 与 localhost 放行 / real emails, examples allowed'),
-    ('paths', '本机绝对路径 → 警告，不阻断 / local absolute paths → warning'),
-    ('links', '图片必须存在（报错），相对链接必须存在（警告）/ dead images fail, dead links warn'),
-    ('todo', '残留 TODO: / FIXME:'),
+    ('length', 'at most 120 lines'),
+    ('sections', 'required sections, fixed order'),
+    ('date', 'absolute date in the status line'),
+    ('vague', 'vague wording: "basically done", "almost done", "keep improving" …'),
+    ('states', 'progress table uses only ✅ 🟡 ⬜ ⛔'),
+    ('next', 'max 5 next steps, each one actionable'),
+    ('secrets', 'keys: sk- / ghp_ / AKIA / private keys / long hex / plaintext passwords'),
+    ('email', 'real emails; example.com and localhost are allowed'),
+    ('paths', 'local absolute paths → warning, not fatal'),
+    ('links', 'images must exist (error), relative links must exist (warning)'),
+    ('todo', 'leftover TODO: / FIXME:'),
 ]
 
 EMAIL = re.compile(r'[\w.+-]+@[\w-]+\.[A-Za-z]{2,}')
 EMAIL_OK = ('example.com', 'example.org', 'users.noreply.github.com', 'localhost')
 HOME = re.compile(r'/(?:Users|home)/[A-Za-z0-9._-]+')
 
-# ![alt](path "title") 或 [text](path)
+# ![alt](path "title") or [text](path)
 LINK = re.compile(r'(!?)\[([^\]]*)\]\(\s*([^)\s]*)(?:\s+"[^"]*")?\s*\)')
 REMOTE = ('http://', 'https://', '//', '#', 'mailto:', 'tel:', 'data:', 'ftp://')
 
@@ -110,7 +122,7 @@ def check_links(text, root):
             target = unquote(raw.strip())
             if not target or _is_remote(target):
                 continue
-            if any(c in target for c in '<>{}*|'):     # 模板占位符，不猜
+            if any(c in target for c in '<>{}*|'):     # template placeholder, not a path
                 continue
             path = target.split('#')[0].split('?')[0]
             if not path:
@@ -118,17 +130,17 @@ def check_links(text, root):
             full = os.path.normpath(os.path.join(base, path.lstrip('/')))
             try:
                 if os.path.normcase(os.path.commonpath([base, full])) != os.path.normcase(base):
-                    continue          # 出了项目目录，不管
-            except ValueError:        # Windows 上跨盘符
+                    continue          # outside the project, not our business
+            except ValueError:        # different drives on Windows
                 continue
             if os.path.exists(full):
                 continue
             if bang:
                 found.append((i, 'error',
-                              f'图片不存在：{path}（推上去就是破图）'))
+                              f'image not found: {path} (it renders as a broken box)'))
             else:
                 found.append((i, 'warning',
-                              f'相对链接指向不存在的文件：{path}'))
+                              f'relative link points at a missing file: {path}'))
     return found
 
 
@@ -159,9 +171,9 @@ def lint_text(text, root=None):
     add = lambda n, lvl, msg: problems.append((n, lvl, msg))
 
     if len(lines) > MAX_LINES:
-        add(0, 'error', f'{len(lines)} 行，超过 {MAX_LINES} 行（没提炼）')
+        add(0, 'error', f'{len(lines)} lines, over the {MAX_LINES}-line cap (not distilled)')
 
-    # 小节顺序
+    # Section order
     seen = []
     for i, line in enumerate(lines, 1):
         if line.startswith('## '):
@@ -170,24 +182,24 @@ def lint_text(text, root=None):
                 seen.append(key)
     missing = [k for k, _ in SECTIONS if k not in seen]
     if missing:
-        add(0, 'error', '缺少小节：' + '、'.join(missing))
+        add(0, 'error', 'missing sections: ' + ', '.join(missing))
     elif seen != [k for k, _ in SECTIONS]:
-        add(0, 'error', '小节顺序不对：' + ' → '.join(seen))
+        add(0, 'error', 'sections out of order: ' + ' -> '.join(seen))
 
-    # 状态行日期
+    # Absolute date in the status line
     head = '\n'.join(lines[:4])
     if not re.search(r'20\d\d-\d\d-\d\d', head):
-        add(1, 'error', '状态行没有绝对日期（YYYY-MM-DD）')
+        add(1, 'error', 'status line has no absolute date (YYYY-MM-DD)')
 
-    # 模糊表述
+    # Vague wording
     for i, line in enumerate(lines, 1):
         low = line.lower()
         for word in VAGUE:
             if word.lower() in low:
-                add(i, 'error', f'模糊表述「{word}」，写具体数字或状态')
+                add(i, 'error', f'vague wording "{word}" — write a number or a state')
                 break
 
-    # 进度表状态符号
+    # State markers in the progress table
     in_progress = False
     for i, line in enumerate(lines, 1):
         if line.startswith('## '):
@@ -197,47 +209,48 @@ def lint_text(text, root=None):
             cells = [c.strip() for c in line.strip('|').split('|')]
             if not cells or set(cells[0]) <= set('-: '):
                 continue
-            if cells[-1].lower() in ('状态', 'state', 'status', ''):
-                continue          # 表头
+            if cells[-1].lower() in HEADER_CELLS:
+                continue          # header row
             if any(s in cells[-1] for s in STATES):
                 continue
-            if re.search(r'完成|进行|待做|阻塞|done|wip|todo|block', cells[-1], re.I):
+            if STATE_SYNONYMS.search(cells[-1]):
                 continue
-            add(i, 'error', '进度表状态不是 ✅ / 🟡 / ⬜ / ⛔')
+            add(i, 'error', 'progress state must be one of ✅ / 🟡 / ⬜ / ⛔')
 
-    # 下一步
+    # Next steps
     items, in_next = [], False
     for i, line in enumerate(lines, 1):
         if line.startswith('## '):
             in_next = section_key(line[3:]) == 'next'
             continue
-        if in_next and re.match(r'\s*\d+[.、)]\s+', line):
-            items.append((i, re.sub(r'\s*\d+[.、)]\s+', '', line).strip()))
+        if in_next and NUMBERED.match(line):
+            items.append((i, NUMBERED.sub('', line).strip()))
     if not items:
-        add(0, 'error', '「下一步」里没有编号条目')
+        add(0, 'error', 'the "next steps" section has no numbered items')
     if len(items) > MAX_NEXT:
-        add(items[MAX_NEXT][0], 'error', f'下一步 {len(items)} 条，超过 {MAX_NEXT} 条')
+        add(items[MAX_NEXT][0], 'error', f'{len(items)} next steps, the cap is {MAX_NEXT}')
     for n, item in items:
         if not actionable(item):
-            add(n, 'error', f'下一步不可执行（没有路径、数字或动词）：{item[:28]}')
+            add(n, 'error', f'next step is not actionable (no path, number or verb): {item[:28]}')
 
-    # 密钥 / 邮箱 / 本机路径
+    # Keys / emails / local paths
     for i, line in enumerate(lines, 1):
         for pat, name in SECRET_PATTERNS:
             if pat.search(line):
-                add(i, 'error', f'疑似{name}，删掉再交接')
+                add(i, 'error', f'possible {name} — remove it before handing off')
         for m in EMAIL.finditer(line):
             if not m.group(0).lower().endswith(EMAIL_OK):
-                add(i, 'error', f'疑似真实邮箱：{m.group(0)}')
+                add(i, 'error', f'looks like a real email: {m.group(0)}')
         if HOME.search(line):
-            add(i, 'warning', '含本机绝对路径，交接时别人打不开')
+            add(i, 'warning', 'local absolute path — the next person cannot open it')
 
-    # 遗留标记
+    # Leftover markers
     for i, line in enumerate(lines, 1):
-        if re.search(r'\b(TODO|FIXME|XXX)\s*[:：]', line):
-            add(i, 'error', '文档里还留着 TODO/FIXME')
+        if TODO_MARK.search(line):
+            add(i, 'error', 'TODO/FIXME left in the document')
 
-    # 死链：图片断了自己先看见，链接断了下一个人踩空
+    # Dead links: a broken image you see yourself, a broken link the next
+    # person walks into.
     for n, lvl, msg in check_links(text, root):
         add(n, lvl, msg)
 
@@ -268,7 +281,7 @@ def main():
             print(json.dumps({'ok': False, 'error': 'no PROGRESS.md', 'path': path},
                              ensure_ascii=False))
         else:
-            print(f'找不到 {path}')
+            print(f'no PROGRESS.md at {path}')
         sys.exit(2)
 
     text = open(path, encoding='utf-8', errors='ignore').read()
@@ -284,16 +297,16 @@ def main():
             'problems': [{'line': n, 'level': l, 'message': m} for n, l, m in problems],
         }, ensure_ascii=False))
     else:
-        print(f'{path}  ({n_lines} 行)')
+        print(f'{path}  ({n_lines} lines)')
         for n, lvl, msg in sorted(problems):
             mark = '✗' if lvl == 'error' else '⚠'
             where = f'line {n:>3}' if n else '     '
             print(f'  {where}  {mark}  {msg}')
         if ok:
-            print('  ✓ 可以交接')
+            print('  ✓ safe to hand off')
         else:
-            print(f'  {len(errors)} 个问题'
-                  + (f'，{len(warns)} 个提醒' if warns else ''))
+            print(f'  {len(errors)} problem(s)'
+                  + (f', {len(warns)} warning(s)' if warns else ''))
 
     sys.exit(0 if ok else 1)
 

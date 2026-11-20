@@ -26,14 +26,14 @@ class CardBuild(unittest.TestCase):
         self.assertNotIn('class="stats"', html)
 
     def test_highlight_wraps_first_occurrence_only(self):
-        html = card.build({'title': '上线前上线后', 'highlight': ['上线']})
-        self.assertEqual(html.count('<em>上线</em>'), 1)
+        html = card.build({'title': 'ship it, ship it again', 'highlight': ['ship']})
+        self.assertEqual(html.count('<em>ship</em>'), 1)
 
     def test_long_title_shrinks_font(self):
         short = int(re.search(r'<h1 style="font-size:(\d+)px"',
-                              card.build({'title': '短'})).group(1))
+                              card.build({'title': 'short'})).group(1))
         long = int(re.search(r'<h1 style="font-size:(\d+)px"',
-                             card.build({'title': '很长的标题' * 8})).group(1))
+                             card.build({'title': 'a very long title ' * 8})).group(1))
         self.assertLess(long, short)
         self.assertGreaterEqual(long, 36)
 
@@ -43,13 +43,13 @@ class CardCli(ProjectCase):
         path = self.write('bad.json', '{oops')
         out = run('card.py', path)
         self.assertNotEqual(out.returncode, 0)
-        self.assertIn('不是合法 JSON', out.stderr)
+        self.assertIn('is not valid JSON', out.stderr)
         self.assertNotIn('Traceback', out.stderr)
 
     def test_missing_file_is_a_clean_error(self):
         out = run('card.py', os.path.join(self.root, 'nope.json'))
         self.assertNotEqual(out.returncode, 0)
-        self.assertIn('找不到', out.stderr)
+        self.assertIn('not found', out.stderr)
 
     def test_writes_html_even_without_browser(self):
         path = self.write('s.json', '{"title":"x"}')

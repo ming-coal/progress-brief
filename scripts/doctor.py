@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """Handoff / context-hygiene advisor.
 
-Answers one question: 现在该继续、该更新文档、还是该开新窗口？
+Answers one question: continue now, update the doc first, or open a new window?
 
   python3 doctor.py [path] [--days 3]
 
-退出码：0 健康 / 1 需要更新文档 / 2 没有文档
+Exit codes: 0 healthy / 1 the doc needs updating / 2 no doc at all
 """
 
 import json
 import os
 import subprocess
 import sys
+
 
 def _utf8_stdio():
     """Windows consoles default to cp1252; our output is UTF-8."""
@@ -97,23 +98,23 @@ def main():
 
     def ago(sec):
         if sec < 3600:
-            return f'{int(sec / 60)} 分钟前'
+            return f'{int(sec / 60)}m ago'
         if sec < 86400:
-            return f'{sec / 3600:.1f} 小时前'
-        return f'{sec / 86400:.0f} 天前'
+            return f'{sec / 3600:.1f}h ago'
+        return f'{sec / 86400:.0f}d ago'
 
     out = [f'# DOCTOR {root}']
-    scale = '小型' if len(sources) < 20 else ('中型' if len(sources) < 150 else '大型')
-    out.append(f'规模    {len(files)} 文件 · {len(sources)} 个源文件 · {human(total)} · {scale}')
+    scale = 'small' if len(sources) < 20 else ('medium' if len(sources) < 150 else 'large')
+    out.append(f'scale   {len(files)} files · {len(sources)} source files · {human(total)} · {scale}')
 
     code = 0
     n_lines = 0
     if not doc:
-        out.append('文档    没有 PROGRESS.md')
+        out.append('doc     no PROGRESS.md')
         if len(sources) < 15:
-            verdict = '✅ 规模够小，不需要文档，直接读 README 也行'
+            verdict = '✅ small enough — no doc needed, reading the README is fine'
         else:
-            verdict = '⛔ 没有交接文档，下一个窗口要从零读代码'
+            verdict = '⛔ no handoff doc — the next window starts from zero'
             code = 2
         age_d = None
     else:
@@ -122,48 +123,48 @@ def main():
         age_d = age / 86400
         with open(p, encoding='utf-8', errors='ignore') as fh:
             n_lines = fh.read().count('\n') + 1
-        out.append(f'文档    {os.path.relpath(p, root)} · {n_lines} 行 · {ago(age)}')
+        out.append(f'doc     {os.path.relpath(p, root)} · {n_lines} lines · {ago(age)}')
 
-        # 2 秒容差：刚写完文档时不算漂移
+        # 2-second tolerance: a doc written just now is not drift
         drift = [q for q, _, mm in sources if mm > m + 2]
-        note = f'{len(drift)} 个源文件改动'
+        note = f'{len(drift)} source files changed'
         if dirty_n:
-            note += f' · git 未提交 {dirty_n}'
-        out.append(f'漂移    文档后 {note}')
+            note += f' · {dirty_n} uncommitted in git'
+        out.append(f'drift   after the doc: {note}')
 
         if len(drift) > 20 or (age_d > 7 and len(drift) > 5):
-            verdict = '⛔ 文档已过期，现在交接会误导下一个窗口'
+            verdict = '⛔ the doc is stale — handing over now would mislead the next window'
             code = 1
         elif n_lines > 120:
-            verdict = f'🟡 文档 {n_lines} 行，超过 120 行说明没提炼，先砍再交接'
+            verdict = f'🟡 the doc is {n_lines} lines; over 120 means it was not distilled'
             code = 1
         elif len(drift) > 3 or (dirty_n >= 5 and age > 3600):
-            verdict = '🟡 有漂移，交接前更新「进度表 / 下一步」两节就够'
+            verdict = '🟡 some drift — rewrite the progress table and next steps before handing off'
             code = 1
         else:
-            verdict = '✅ 文档新鲜，可以直接开新窗口交接'
+            verdict = '✅ the doc is fresh — safe to hand off as-is'
 
-    out.append(f'判断    {verdict}')
+    out.append(f'verdict {verdict}')
 
     actions = []
     if code == 2:
-        actions.append('跑 scan.py 写一份 PROGRESS.md（约 2 分钟），再开新窗口')
+        actions.append('run scan.py and write a PROGRESS.md (~2 min), then open a new window')
     elif code == 1:
-        actions.append('只改 PROGRESS.md 的状态行、进度表、下一步；别追加新章节')
+        actions.append('rewrite only the status line, progress table and next steps; add no sections')
     if branch:
-        actions.append(f'交接时把分支名写进文档：{branch}')
+        actions.append(f'put the branch name in the doc: {branch}')
     if actions and not quiet:
         out.append('')
-        out.append('建议')
+        out.append('suggestions')
         for i, a in enumerate(actions, 1):
             out.append(f'  {i}. {a}')
 
     if not quiet and not as_json:
         out.append('')
-        out.append('窗口卫生（当前对话自检）')
-        out.append('  该压缩  同一话题第 2 次解释背景 / 一次回答要贴 3 个以上文件全文 / 上下文过半但还剩 >3 步')
-        out.append('  该新开  任务换模块 / 一次交付或合并完成 / 开始用「我记得前面说过」推进')
-        out.append('  别硬撑  上下文满了还继续，模型会悄悄丢细节，写出来的东西对不上代码')
+        out.append('window hygiene (check the current chat)')
+        out.append('  compact    same background explained twice / an answer pasting 3+ whole files / context half gone, >3 steps left')
+        out.append('  new window the task switched modules / a delivery just landed / you start with "as I said earlier"')
+        out.append('  do not push on  when context fills up the model quietly drops details and the code stops matching')
 
     if as_json:
         print(json.dumps({

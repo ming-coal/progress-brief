@@ -9,7 +9,7 @@ no runtime dependencies, no build step.
 python3 -m unittest discover -s tests -v
 ```
 
-73 tests, about 9 seconds.
+76 tests, about 9 seconds.
 
 ## Ground rules
 
@@ -19,6 +19,9 @@ python3 -m unittest discover -s tests -v
   by `tests/test_tiers.py`; if you change the estimator, that test should tell you.
 - **Keep the tool honest.** If a number gets worse, print the worse number. If a rule
   can't be enforced, say so instead of implying it is.
+- **English in code and tests.** Comments, docstrings, messages and fixtures. The one
+  exception is the marked vocabulary block in `lint.py`: the linter has to read Chinese
+  documents. `tests/test_no_cjk.py` enforces this — write CJK samples as `\u4e2d`.
 
 ## Where things live
 

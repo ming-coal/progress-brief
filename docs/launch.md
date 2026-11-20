@@ -37,7 +37,7 @@ description: >-
 Row for the `Community Skills` table:
 
 ```markdown
-- **[progress-brief](https://github.com/ming-coal/progress-brief)** - Repo-first handoff skill: scans the project, writes a converged PROGRESS.md, lints it, and decides when to restart the session. Stdlib Python, no dependencies, 73 tests.
+- **[progress-brief](https://github.com/ming-coal/progress-brief)** - Repo-first handoff skill: scans the project, writes a converged PROGRESS.md, lints it, and decides when to restart the session. Stdlib Python, no dependencies, 76 tests.
 ```
 
 PR body:
@@ -50,7 +50,7 @@ PR body:
 >
 > - repo: https://github.com/ming-coal/progress-brief
 > - license: MIT
-> - tests: 73, CI on macOS/Linux/Windows × Python 3.10–3.13
+> - tests: 76, CI on macOS/Linux/Windows × Python 3.10–3.13
 >
 > I have read CONTRIBUTING.md and am submitting this myself, not via an automated agent.
 
@@ -87,7 +87,7 @@ Post once per channel, different opening line each time. Never paste the same te
 >
 > scan → PROGRESS.md → lint → "restart the window"
 >
-> Plain Python. 73 tests. MIT.
+> Plain Python. 76 tests. MIT.
 
 **即刻 / V2EX**
 
