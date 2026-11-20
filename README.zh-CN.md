@@ -9,7 +9,7 @@
 macOS / Linux / Windows 都一样。
 
 ```bash
-git clone <本仓库> ~/.config/opencode/skills/progress-brief
+git clone https://github.com/ming-coal/progress-brief ~/.config/opencode/skills/progress-brief
 python3 ~/.config/opencode/skills/progress-brief/scripts/install.py   # 或 --target claude
 ```
 

@@ -10,7 +10,7 @@ Works with **OpenCode** and **Claude Code** (Agent Skills format). Stdlib Python
 no dependencies, macOS / Linux / Windows.
 
 ```bash
-git clone <this repo> ~/.config/opencode/skills/progress-brief
+git clone https://github.com/ming-coal/progress-brief ~/.config/opencode/skills/progress-brief
 python3 ~/.config/opencode/skills/progress-brief/scripts/install.py   # or --target claude
 ```
 
