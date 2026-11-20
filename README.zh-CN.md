@@ -5,7 +5,7 @@
 
 [![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
 
-![文档没过 lint，改完通过](docs/how-it-works.png)
+![扫描 → PROGRESS.md → lint → 判定](docs/how-it-works.png)
 
 ## 安装
 
