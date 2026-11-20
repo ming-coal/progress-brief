@@ -76,7 +76,7 @@ class ScanCli(ProjectCase):
     def test_broken_ledger_line_is_ignored(self):
         self.write('a.py', 'x = 1\n')
         run('scan.py', self.root, env=self.env)
-        with open(self.ledger, 'a') as fh:
+        with open(self.ledger, 'a', encoding='utf-8') as fh:
             fh.write('not json{{\n')
         out = run('scan.py', self.root, env=self.env)
         self.assertEqual(out.returncode, 0)

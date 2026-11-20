@@ -40,7 +40,7 @@ class ProjectCase(unittest.TestCase):
     def write(self, rel, text):
         path = os.path.join(self.root, rel)
         os.makedirs(os.path.dirname(path) or self.root, exist_ok=True)
-        with open(path, 'w') as fh:
+        with open(path, 'w', encoding='utf-8') as fh:
             fh.write(text)
         return path
 
