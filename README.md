@@ -6,7 +6,7 @@ restart the conversation instead of pushing on.
 
 [![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
 
-![scan → PROGRESS.md → lint → verdict](docs/how-it-works.png)
+![lint rejects a vague doc, then it passes](docs/how-it-works.gif)
 
 ## Install
 
