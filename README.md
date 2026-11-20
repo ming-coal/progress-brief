@@ -39,6 +39,9 @@ python3 progress-brief/scripts/install.py
 That is enough for any agent that can run a shell: the repo resolves from GitHub, and the
 `SKILL.md` at the root is the whole definition.
 
+Skills are loaded when the agent starts, so **restart the session** after installing —
+then ask for a progress brief and it should pick this up.
+
 Then just say: *"this project is half done — give me a progress brief for the next window."*
 
 ---
