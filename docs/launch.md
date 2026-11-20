@@ -102,7 +102,7 @@ Post once per channel, different opening line each time. Never paste the same te
 | when | what |
 |---|---|
 | day 0–2 | social preview (done), demo image (done), first posts on X + 即刻 |
-| day 3–7 | the video; pin the repo in the profile; answer every issue within a day |
+| day 3–7 | pin the repo in the profile; answer every issue within a day. No video: the README figure already shows fail → pass |
 | week 2 | V2EX / Reddit / Show HN (one, not all) |
 | week 3 | ask 5 people who build with agents to try it and file one issue each |
 | at 10 stars | submit to awesome-claude-skills (manually) |
