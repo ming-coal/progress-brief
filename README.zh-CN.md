@@ -7,13 +7,24 @@
 
 ![progress-brief 状态卡](docs/handoff-card.zh-CN.png)
 
-支持 **OpenCode** 和 **Claude Code**（Agent Skills 格式）。纯 Python 3.10+，零依赖，
-macOS / Linux / Windows 都一样。
+不绑某一个工具。本质是一份 markdown 规则 + 几个纯 Python 3.10+ 脚本，
+**只要 agent 能执行 shell 命令就能用**。
 
 ```bash
-git clone https://github.com/ming-coal/progress-brief ~/.config/opencode/skills/progress-brief
-python3 ~/.config/opencode/skills/progress-brief/scripts/install.py   # 或 --target claude
+git clone https://github.com/ming-coal/progress-brief
+python3 progress-brief/scripts/install.py
 ```
+
+| 你的工具 | 怎么接进去 |
+|---|---|
+| **OpenCode** | `--target opencode` → `~/.config/opencode/skills/` |
+| **Claude Code** | `--target claude` → `~/.claude/skills/` |
+| **Cursor · Codex · Gemini CLI · Windsurf · Cline · Copilot** | `--agents-md AGENTS.md`（或 `GEMINI.md`、`.cursor/rules/...`），装脚本并把一段规则写进该文件 |
+| **其他 agent / 聊天界面** | `--prompt` 打印一段可直接粘贴的规则 |
+| **只装到某个项目** | `--project ~/work/thing` |
+| **任意目录** | `--dest ~/tools/progress-brief` |
+
+`--agents-md` 是幂等的：重跑只会替换那一段，文件其他地方不动。
 
 然后直接说：「这个项目做到一半了，帮我整理个进度，我下次换窗口接着做」。
 

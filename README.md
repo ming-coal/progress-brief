@@ -8,13 +8,24 @@ restart the conversation instead of pushing on.
 
 ![progress-brief status card](docs/handoff-card.png)
 
-Works with **OpenCode** and **Claude Code** (Agent Skills format). Stdlib Python 3.10+,
-no dependencies, macOS / Linux / Windows.
+Not tied to one agent. The skill is markdown plus plain Python 3.10+ scripts; it works
+anywhere an agent can run a shell command.
 
 ```bash
-git clone https://github.com/ming-coal/progress-brief ~/.config/opencode/skills/progress-brief
-python3 ~/.config/opencode/skills/progress-brief/scripts/install.py   # or --target claude
+git clone https://github.com/ming-coal/progress-brief
+python3 progress-brief/scripts/install.py
 ```
+
+| your tool | how it gets wired |
+|---|---|
+| **OpenCode** | `--target opencode` → `~/.config/opencode/skills/` |
+| **Claude Code** | `--target claude` → `~/.claude/skills/` |
+| **Cursor · Codex · Gemini CLI · Windsurf · Cline · Copilot** | `--agents-md AGENTS.md` (or `GEMINI.md`, `.cursor/rules/...`) — installs the scripts and writes a managed block into that file |
+| **any other agent / chat UI** | `--prompt` prints a paste-ready block |
+| **one project only** | `--project ~/work/thing` |
+| **custom location** | `--dest ~/tools/progress-brief` |
+
+`--agents-md` is idempotent: re-running replaces the block and leaves the rest of the file alone.
 
 Then just say: *"this project is half done — give me a progress brief for the next window."*
 

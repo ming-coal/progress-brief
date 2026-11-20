@@ -1,18 +1,65 @@
 #!/usr/bin/env python3
-"""Install progress-brief into a skills directory.
+"""Install progress-brief for any agent that can run a shell.
 
-Works on macOS / Linux / Windows, with no extra dependencies.
+Native skill directories are just one way to deliver it. Where a tool has no
+skill format, the same rules can be injected into AGENTS.md / GEMINI.md /
+.cursor/rules, or printed as a prompt to paste anywhere.
 
-  python3 install.py                 # auto-detect OpenCode / Claude Code
-  python3 install.py --target claude # ~/.claude/skills
-  python3 install.py --target opencode
-  python3 install.py --project ~/x   # only this project (.opencode/skills)
-  python3 install.py --dry-run       # print what it would do
+  python3 install.py                          # auto-detect OpenCode / Claude Code
+  python3 install.py --target opencode        # ~/.config/opencode/skills
+  python3 install.py --target claude          # ~/.claude/skills
+  python3 install.py --project ~/x            # project-local .opencode/skills
+  python3 install.py --dest ~/tools/pb        # exact folder, any layout
+  python3 install.py --agents-md AGENTS.md    # install + wire it into that file
+  python3 install.py --prompt                 # print a paste-ready block
+  python3 install.py --dry-run                # show what would happen
+
+Tested with OpenCode and Claude Code skill folders; --agents-md covers Cursor,
+Codex, Gemini CLI, Windsurf, Cline, Copilot and anything else that reads a
+markdown instruction file.
 """
 
 import os
+import re
 import shutil
 import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent          # .../progress-brief/scripts
+ROOT = HERE.parent                               # .../progress-brief
+NAME = 'progress-brief'
+IGNORE = shutil.ignore_patterns(
+    '.usage.jsonl', '__pycache__', '*.pyc', 'tests', '.github', '.git')
+
+START = '<!-- progress-brief:start'
+END = '<!-- progress-brief:end -->'
+
+PROMPT = '''{start} — managed by install.py; edits inside will be overwritten -->
+## progress-brief — handoff docs and when to restart
+
+Scripts live in `{dir}/scripts/`.
+
+When the user asks for a progress brief or handoff doc, says they are switching
+windows, or a long session is drifting:
+
+1. **Decide first**: `python3 "{dir}/scripts/doctor.py" . --quiet`
+   exit `0` = doc is fresh, hand off as-is; `1` = rewrite only the progress
+   table and next steps; `2` = write a new `PROGRESS.md`.
+2. **Scan, don't read**: `python3 "{dir}/scripts/scan.py" . --days 7`
+   Never `ls` the repo and never read a dozen source files.
+3. **Write** `PROGRESS.md` at the project root, ≤120 lines, fixed order:
+   status line with an absolute date, one-liner, output, progress table
+   (✅ 🟡 ⬜ ⛔), where things live, decisions, pitfalls, next steps (≤5, each
+   executable), open questions.
+4. **Check it**: `python3 "{dir}/scripts/lint.py" .` — fix until it passes.
+   A doc that fails lint is not a handoff.
+5. **Restart advice**: recommend a new window when the task switches domains,
+   a delivery just landed, or the same background is explained twice.
+
+Write in the user's language. Never put keys, real emails or local absolute
+paths in the document.
+{end}'''
+
 
 def _utf8_stdio():
     """Windows consoles default to cp1252; our output is UTF-8."""
@@ -23,17 +70,7 @@ def _utf8_stdio():
             pass
 
 
-from pathlib import Path
-
-HERE = Path(__file__).resolve().parent          # .../progress-brief/scripts
-ROOT = HERE.parent                               # .../progress-brief
-NAME = 'progress-brief'
-IGNORE = shutil.ignore_patterns(
-    '.usage.jsonl', '__pycache__', '*.pyc', 'tests', '.github', '.git')
-
-
 def opencode_config_dirs():
-    """Where OpenCode keeps its config, most likely first."""
     out = []
     if os.name == 'nt':
         for env in ('APPDATA', 'LOCALAPPDATA'):
@@ -47,25 +84,22 @@ def opencode_config_dirs():
     return out
 
 
-def overlaps(a, b):
-    """True if one path is the same as, or inside, the other."""
-    a = Path(a).resolve()
-    b = Path(b).resolve()
-    return a == b or a in b.parents or b in a.parents
-
-
 def claude_dirs():
-    """Where Claude Code keeps skills, most likely first."""
     return [Path.home() / '.claude']
 
 
-def target_dir(project=None, target='auto'):
+def overlaps(a, b):
+    a, b = Path(a).resolve(), Path(b).resolve()
+    return a == b or a in b.parents or b in a.parents
+
+
+def target_dir(project=None, target='auto', dest=None):
+    if dest:
+        return Path(dest).expanduser().resolve()
     if project:
-        base = Path(project).expanduser().resolve() / '.opencode'
-        return base / 'skills' / NAME
+        return Path(project).expanduser().resolve() / '.opencode' / 'skills' / NAME
     if target == 'claude':
         return claude_dirs()[0] / 'skills' / NAME
-    # 已存在的目录优先，避免装到错位置
     for base in opencode_config_dirs():
         for sub in ('skills', 'skill'):
             if (base / sub).is_dir():
@@ -77,41 +111,83 @@ def target_dir(project=None, target='auto'):
     return opencode_config_dirs()[-1] / 'skills' / NAME
 
 
+def prompt_block(skill_dir):
+    return PROMPT.format(start=START, end=END, dir=str(skill_dir))
+
+
+def write_agents_md(path, skill_dir):
+    """Insert or replace the block, leaving the rest of the file alone."""
+    path = Path(path).expanduser()
+    block = prompt_block(skill_dir)
+    if path.exists():
+        text = path.read_text(encoding='utf-8')
+    else:
+        text = ''
+        path.parent.mkdir(parents=True, exist_ok=True)
+    pattern = re.compile(r'<!-- progress-brief:start.*?<!-- progress-brief:end -->',
+                         re.DOTALL)
+    if pattern.search(text):
+        text = pattern.sub(block, text)
+    else:
+        text = (text.rstrip() + '\n\n' + block + '\n') if text.strip() else block + '\n'
+    path.write_text(text, encoding='utf-8')
+    return path
+
+
 def main():
     _utf8_stdio()
     args = sys.argv[1:]
     project = None
     if '--project' in args:
         project = args[args.index('--project') + 1]
+    dest = None
+    if '--dest' in args:
+        dest = args[args.index('--dest') + 1]
     target = 'auto'
     if '--target' in args:
         target = args[args.index('--target') + 1]
         if target not in ('auto', 'opencode', 'claude'):
-            sys.exit('--target must be auto, opencode or claude')
+            sys.exit('--target must be auto, opencode or claude (use --dest for anything else)')
+    agents_md = None
+    if '--agents-md' in args:
+        i = args.index('--agents-md')
+        agents_md = args[i + 1] if len(args) > i + 1 and not args[i + 1].startswith('-') else 'AGENTS.md'
     dry = '--dry-run' in args
 
-    dest = target_dir(project, target)
+    resolved = target_dir(project, target, dest)
+
+    if '--prompt' in args:
+        print(prompt_block(resolved if dest else ROOT))
+        return
+
     src_files = [p for p in ROOT.rglob('*') if p.is_file() and '__pycache__' not in p.parts]
     print(f'source : {ROOT}  ({len(src_files)} files)')
-    print(f'target : {dest}')
+    print(f'target : {resolved}')
 
-    if overlaps(dest, ROOT):
+    if overlaps(resolved, ROOT):
         print('\nrefusing to install into itself; pick another target')
         sys.exit(1)
 
     if dry:
+        if agents_md:
+            print(f'agents : would write the block into {agents_md}')
         print('\n(dry-run) nothing written')
         return
 
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    if dest.exists():
-        shutil.rmtree(dest)
-    shutil.copytree(ROOT, dest, ignore=IGNORE)
+    resolved.parent.mkdir(parents=True, exist_ok=True)
+    if resolved.exists():
+        shutil.rmtree(resolved)
+    shutil.copytree(ROOT, resolved, ignore=IGNORE)
+    print(f'\ninstalled: {resolved}')
 
-    print(f'\ninstalled: {dest}')
+    if agents_md:
+        written = write_agents_md(agents_md, resolved)
+        print(f'wired   : {written}  (block is idempotent, safe to re-run)')
+
     print('\n验证：')
-    print(f'  python3 "{dest / "scripts" / "scan.py"}" . --no-ledger')
-    print('\n然后在任意 OpenCode 会话里说：「给这个目录写个进度文档」')
+    print(f'  python3 "{resolved / "scripts" / "scan.py"}" . --no-ledger')
+    if not agents_md:
+        print('\n然后在会话里说：「给这个目录写个进度文档」')
     if project:
         print('提示：项目级技能需要在该项目目录下开会话才会生效。')
 

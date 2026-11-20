@@ -219,4 +219,6 @@ Standard handoff, all three required:
 - Pure `python3` (3.10+), identical on macOS / Linux / Windows.
 - PNG needs Chrome / Chromium / Edge / Brave; auto-detected, HTML fallback otherwise.
 - Override: `PROGRESS_BRIEF_CHROME=/path/to/chrome python3 card.py status.json`
-- Install: `python3 scripts/install.py` (detects `skills` vs `skill`), `--project <path>` for per-project.
+- Install: `python3 scripts/install.py` (detects `skills` vs `skill`), `--project <path>` for per-project,
+  `--dest <dir>` for any layout, `--agents-md <file>` to wire agents without a skill format,
+  `--prompt` to print a paste-ready block.
