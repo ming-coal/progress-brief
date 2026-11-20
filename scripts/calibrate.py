@@ -14,6 +14,16 @@ the per-file error once those constants are applied.
 import os
 import sys
 
+def _utf8_stdio():
+    """Windows consoles default to cp1252; our output is UTF-8."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
+
+
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import scan  # noqa: E402
 
@@ -58,6 +68,7 @@ def fit(rows):
 
 
 def main():
+    _utf8_stdio()
     try:
         import tiktoken
     except ImportError:

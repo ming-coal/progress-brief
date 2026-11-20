@@ -12,6 +12,16 @@ import json
 import os
 import subprocess
 import sys
+
+def _utf8_stdio():
+    """Windows consoles default to cp1252; our output is UTF-8."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
+
+
 import time
 
 SKIP = {
@@ -53,13 +63,15 @@ def walk(root, max_files=20000):
 def git(root, *args):
     try:
         r = subprocess.run(['git', '-C', root, *args],
-                           capture_output=True, text=True, timeout=10)
+                           capture_output=True, text=True, encoding='utf-8',
+                           errors='replace', timeout=10)
         return r.stdout.strip() if r.returncode == 0 else ''
     except Exception:
         return ''
 
 
 def main():
+    _utf8_stdio()
     root = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else '.')
     days = 3
     if '--days' in sys.argv:
@@ -108,7 +120,7 @@ def main():
         p, s, m = doc
         age = now - m
         age_d = age / 86400
-        with open(p, errors='ignore') as fh:
+        with open(p, encoding='utf-8', errors='ignore') as fh:
             n_lines = fh.read().count('\n') + 1
         out.append(f'文档    {os.path.relpath(p, root)} · {n_lines} 行 · {ago(age)}')
 

@@ -12,6 +12,16 @@ import json
 import os
 import subprocess
 import sys
+
+def _utf8_stdio():
+    """Windows consoles default to cp1252; our output is UTF-8."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
+
+
 import time
 from pathlib import Path
 
@@ -154,7 +164,8 @@ def git(root, *args):
     try:
         out = subprocess.run(
             ['git', '-C', root, *args],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True, text=True, encoding='utf-8',
+            errors='replace', timeout=10,
         )
         return out.stdout.strip() if out.returncode == 0 else ''
     except Exception:
@@ -165,7 +176,7 @@ def read_ledger():
     rows = []
     if not LEDGER.exists():
         return rows
-    for line in LEDGER.read_text(errors='ignore').splitlines():
+    for line in LEDGER.read_text(encoding='utf-8', errors='ignore').splitlines():
         try:
             rows.append(json.loads(line))
         except ValueError:
@@ -174,6 +185,7 @@ def read_ledger():
 
 
 def main():
+    _utf8_stdio()
     root = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else '.')
     days = 7
     if '--days' in sys.argv:
@@ -221,7 +233,7 @@ def main():
         base = os.path.basename(p)
         if base.upper().startswith('PROGRESS') or base in ('STATUS.md', 'HANDOFF.md'):
             found = True
-            with open(p, 'r', errors='ignore') as fh:
+            with open(p, 'r', encoding='utf-8', errors='ignore') as fh:
                 n_lines = fh.read().count('\n') + 1
             age = int((now - m) / 86400)
             add(f'  {os.path.relpath(p, root)}  ({n_lines} lines, {age}d old)')
@@ -234,7 +246,7 @@ def main():
         if not text_key(p) or os.path.getsize(p) > 400_000:
             continue
         try:
-            with open(p, 'r', errors='ignore') as fh:
+            with open(p, 'r', encoding='utf-8', errors='ignore') as fh:
                 txt = fh.read()
         except OSError:
             continue
@@ -264,7 +276,7 @@ def main():
     pkg = os.path.join(root, 'package.json')
     if os.path.exists(pkg):
         try:
-            data = json.load(open(pkg))
+            data = json.load(open(pkg, encoding='utf-8'))
             scripts = data.get('scripts', {})
             add('')
             add('## scripts')
@@ -294,7 +306,7 @@ def main():
     for p, s, _ in files:
         if os.path.basename(p).upper().startswith('PROGRESS'):
             try:
-                progress_tok += count(open(p, errors='ignore').read())
+                progress_tok += count(open(p, encoding='utf-8', errors='ignore').read())
             except OSError:
                 pass
     brief = brief_lines + progress_tok
@@ -321,7 +333,7 @@ def main():
         rows = read_ledger()
         try:
             LEDGER.parent.mkdir(parents=True, exist_ok=True)
-            with open(LEDGER, 'a') as fh:
+            with open(LEDGER, 'a', encoding='utf-8') as fh:
                 fh.write(json.dumps({
                     'ts': time.strftime('%Y-%m-%dT%H:%M:%S'),
                     'root': root, 'files': len(texts),

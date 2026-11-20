@@ -6,7 +6,7 @@ restart the conversation instead of pushing on.
 
 ![progress-brief status card](docs/hero.png)
 
-Works with **OpenCode** and **Claude Code** (Agent Skills format). Stdlib Python 3.9+,
+Works with **OpenCode** and **Claude Code** (Agent Skills format). Stdlib Python 3.10+,
 no dependencies, macOS / Linux / Windows.
 
 ```bash

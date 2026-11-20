@@ -20,7 +20,8 @@ def run(script, *args, cwd=None, env=None):
         e.update(env)
     return subprocess.run(
         [sys.executable, os.path.join(SCRIPTS, script), *args],
-        capture_output=True, text=True, cwd=cwd, env=e,
+        capture_output=True, text=True, encoding='utf-8', errors='replace',
+        cwd=cwd, env=e,
     )
 
 

@@ -13,6 +13,16 @@ Works on macOS / Linux / Windows, with no extra dependencies.
 import os
 import shutil
 import sys
+
+def _utf8_stdio():
+    """Windows consoles default to cp1252; our output is UTF-8."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
+
+
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent          # .../progress-brief/scripts
@@ -68,6 +78,7 @@ def target_dir(project=None, target='auto'):
 
 
 def main():
+    _utf8_stdio()
     args = sys.argv[1:]
     project = None
     if '--project' in args:

@@ -5,7 +5,7 @@
 
 ![progress-brief 状态卡](docs/hero.png)
 
-支持 **OpenCode** 和 **Claude Code**（Agent Skills 格式）。纯 Python 3.9+，零依赖，
+支持 **OpenCode** 和 **Claude Code**（Agent Skills 格式）。纯 Python 3.10+，零依赖，
 macOS / Linux / Windows 都一样。
 
 ```bash

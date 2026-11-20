@@ -12,6 +12,16 @@ import os
 import re
 import sys
 
+def _utf8_stdio():
+    """Windows consoles default to cp1252; our output is UTF-8."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
+
+
+
 MAX_LINES = 120
 MAX_NEXT = 5
 STATES = ('✅', '🟡', '⬜', '⛔')
@@ -164,6 +174,7 @@ def lint_text(text):
 
 
 def main():
+    _utf8_stdio()
     args = [a for a in sys.argv[1:] if not a.startswith('-')]
     as_json = '--json' in sys.argv
     strict = '--strict' in sys.argv
@@ -181,7 +192,7 @@ def main():
             print(f'找不到 {path}')
         sys.exit(2)
 
-    text = open(path, errors='ignore').read()
+    text = open(path, encoding='utf-8', errors='ignore').read()
     problems, n_lines = lint_text(text)
     errors = [p for p in problems if p[1] == 'error']
     warns = [p for p in problems if p[1] == 'warning']

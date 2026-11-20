@@ -22,6 +22,16 @@ import shutil
 import subprocess
 import sys
 
+def _utf8_stdio():
+    """Windows consoles default to cp1252; our output is UTF-8."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
+
+
+
 # 按平台找浏览器：Chrome / Chromium / Edge / Brave，找不到就只出 HTML
 CHROME_NAMES = [
     'google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser',
@@ -144,12 +154,13 @@ def build(data):
 
 
 def main():
+    _utf8_stdio()
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
     src = sys.argv[1]
     try:
-        with open(src) as fh:
+        with open(src, encoding='utf-8') as fh:
             data = json.load(fh)
     except FileNotFoundError:
         sys.exit(f'找不到 {src}')
@@ -162,7 +173,7 @@ def main():
         html_path = sys.argv[sys.argv.index('--html') + 1]
     if '--png' in sys.argv:
         png_path = sys.argv[sys.argv.index('--png') + 1]
-    open(html_path, 'w').write(html)
+    open(html_path, 'w', encoding='utf-8').write(html)
     print('html', html_path)
 
     chrome = find_chrome()

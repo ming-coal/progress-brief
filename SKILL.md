@@ -216,7 +216,7 @@ Standard handoff, all three required:
 
 ## Platform
 
-- Pure `python3` (3.9+), identical on macOS / Linux / Windows.
+- Pure `python3` (3.10+), identical on macOS / Linux / Windows.
 - PNG needs Chrome / Chromium / Edge / Brave; auto-detected, HTML fallback otherwise.
 - Override: `PROGRESS_BRIEF_CHROME=/path/to/chrome python3 card.py status.json`
 - Install: `python3 scripts/install.py` (detects `skills` vs `skill`), `--project <path>` for per-project.
