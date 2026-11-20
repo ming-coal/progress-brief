@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.4 — 2026-11-20
+
+- **The test count in the docs is now a test.** `README.md` still said "55 stdlib tests"
+  and "2 Python versions" three releases after both had changed; nothing caught it because
+  numbers in prose are not links, so the linter skips them. `tests/test_docs.py` counts
+  `def test_` in `tests/` and fails on every file that disagrees, naming the file and both
+  numbers. `CHANGELOG.md` is exempt — its numbers are history.
+- The same test checks that the CI matrix in the README ("3 OS × 3 Python versions")
+  matches `.github/workflows/test.yml`, so the promise cannot drift from the workflow.
+- 80 tests, up from 78.
+
 ## 0.1.3 — 2026-11-20
 
 - **A failed screenshot is no longer reported as success.** `card.py` printed

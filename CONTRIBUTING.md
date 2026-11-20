@@ -9,7 +9,7 @@ no runtime dependencies, no build step.
 python3 -m unittest discover -s tests -v
 ```
 
-78 tests, about 16 seconds.
+80 tests, about 16 seconds.
 
 ## Ground rules
 
@@ -22,6 +22,9 @@ python3 -m unittest discover -s tests -v
 - **English in code and tests.** Comments, docstrings, messages and fixtures. The one
   exception is the marked vocabulary block in `lint.py`: the linter has to read Chinese
   documents. `tests/test_no_cjk.py` enforces this — write CJK samples as `\u4e2d`.
+- **Adding a test bumps the counts.** Six files quote how many tests there are, and
+  `tests/test_docs.py` fails until they match — it names the files and the numbers, so
+  run it and fix what it lists. `CHANGELOG.md` is exempt: its numbers are history.
 
 ## Where things live
 

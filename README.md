@@ -150,7 +150,7 @@ the repo side: what actually changed, what's stale, and whether the window is wo
 | `scripts/card.py` | JSON → HTML + PNG (auto-finds Chrome/Chromium/Edge) |
 | `scripts/calibrate.py` | re-fit the token estimate against `tiktoken` |
 | `scripts/install.py` | installer (`--target`, `--dest`, `--agents-md`, `--prompt`) |
-| `tests/` | 55 stdlib tests, CI on 3 OS × 2 Python versions |
+| `tests/` | 80 stdlib tests, CI on 3 OS × 3 Python versions |
 
 ## Honest limits
 

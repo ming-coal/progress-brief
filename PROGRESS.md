@@ -1,6 +1,6 @@
 # progress-brief
 
-> Status: **v0.1.3 shipped, CI green on 3 OS, waiting for the first users** · updated 2026-11-20
+> Status: **v0.1.4 shipped, CI green on 3 OS, waiting for the first users** · updated 2026-11-20
 
 ## One-liner
 A handoff skill that reads the repo instead of the chat. Scans a project, writes a
@@ -14,7 +14,7 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 | `scripts/lint.py` | 11 rules | vague wording, sections, actionable steps, secrets, dead images |
 | `scripts/card.py` | 1080×1350 PNG | auto-detects Chrome/Chromium/Edge/Brave, says so when the render fails |
 | `scripts/install.py` | any agent | `--target`, `--dest`, `--agents-md`, `--prompt` |
-| `tests/` | 78 tests | CI: 3 OS × Python 3.10/3.12/3.13 |
+| `tests/` | 80 tests | CI: 3 OS × Python 3.10/3.12/3.13 |
 
 ## Progress
 | # | item | where | state |
@@ -22,7 +22,7 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 | 1 | core scripts + tests | `scripts/`, `tests/` | ✅ done |
 | 2 | any-agent install | `scripts/install.py` | ✅ done |
 | 3 | token calibration | `scripts/calibrate.py` | ✅ done (median 6.8%) |
-| 4 | public repo + release | GitHub `v0.1.3` | ✅ done |
+| 4 | public repo + release | GitHub `v0.1.4` | ✅ done |
 | 5 | first traffic | — | ⬜ 0 stars, 0 visits |
 | 6 | awesome-list listing | blocked on stars | ⛔ needs 10 / 25 stars |
 | 7 | demo video | — | ⛔ dropped: the README figure says it in one screen |
@@ -56,7 +56,8 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 7. An animated demo lost to a static one → each gif frame held a single small panel with half the canvas empty; motion only pays when each frame carries a full screen
 8. Code comments and CLI messages were Chinese in an English repo → the fix is a test, not discipline: `tests/test_no_cjk.py` fails on any Chinese outside the one vocabulary block
 9. `card.py` printed `png  ...` whenever a file of that name already existed, even when Chrome had crashed → render to a scratch path and move it in only on success; `tests/test_card.py` now fails a browser that exits without writing
-10. The committed card PNGs kept a test count from three releases back → a generated asset carries data, so either regenerate it in the same commit as the number or do not ship it
+10. `README.md` promised "55 stdlib tests, 3 OS × 2 Python versions" while 78 tests ran on three Python versions → prose numbers are invisible to a link checker; `tests/test_docs.py` counts the tests and the matrix now)
+11. The committed card PNGs kept a test count from three releases back → a generated asset carries data, so either regenerate it in the same commit as the number or do not ship it
 
 ## Next
 1. post once on X and 即刻 using the copy in `docs/launch.md`
