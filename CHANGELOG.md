@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.3 — 2026-11-20
+
+- **A failed screenshot is no longer reported as success.** `card.py` printed
+  `png  out.png` whenever a file of that name already existed, so a browser that
+  crashed mid-render looked like a clean run on top of the previous image. It now
+  renders to a scratch path and moves the file in only if the render produced one.
+- **Card fonts cover Windows and Linux.** The stack started with `PingFang SC`, which
+  ships with macOS only; a Chinese title on Windows or Linux fell through to whatever
+  the browser picked. Added `Hiragino Sans GB`, `Microsoft YaHei`, `Noto Sans CJK SC`
+  and `Source Han Sans SC`, with a test asserting all three families are present.
+- Dropped `docs/handoff-card.png` and `docs/handoff-card.zh-CN.png`. Both were
+  unreferenced and still said "55 tests"; the card is one command away.
+- `examples/status.json` brought up to date (it still advertised `v0.1 · 55 tests`).
+- 78 tests, up from 76.
+
 ## 0.1.2 — 2026-11-20
 
 - **The scripts speak English.** Every printed message, docstring, comment and test

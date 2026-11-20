@@ -1,6 +1,6 @@
 # progress-brief
 
-> Status: **v0.1.2 shipped, CI green on 3 OS, waiting for the first users** · updated 2026-11-20
+> Status: **v0.1.3 shipped, CI green on 3 OS, waiting for the first users** · updated 2026-11-20
 
 ## One-liner
 A handoff skill that reads the repo instead of the chat. Scans a project, writes a
@@ -12,9 +12,9 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 | `scripts/scan.py` | digest + token ledger | three tiers: worst / typical / brief |
 | `scripts/doctor.py` | exit 0/1/2 | fresh / stale / no doc |
 | `scripts/lint.py` | 11 rules | vague wording, sections, actionable steps, secrets, dead images |
-| `scripts/card.py` | 1080×1350 PNG | auto-detects Chrome/Chromium/Edge/Brave |
+| `scripts/card.py` | 1080×1350 PNG | auto-detects Chrome/Chromium/Edge/Brave, says so when the render fails |
 | `scripts/install.py` | any agent | `--target`, `--dest`, `--agents-md`, `--prompt` |
-| `tests/` | 76 tests | CI: 3 OS × Python 3.10/3.12/3.13 |
+| `tests/` | 78 tests | CI: 3 OS × Python 3.10/3.12/3.13 |
 
 ## Progress
 | # | item | where | state |
@@ -22,7 +22,7 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 | 1 | core scripts + tests | `scripts/`, `tests/` | ✅ done |
 | 2 | any-agent install | `scripts/install.py` | ✅ done |
 | 3 | token calibration | `scripts/calibrate.py` | ✅ done (median 6.8%) |
-| 4 | public repo + release | GitHub `v0.1.2` | ✅ done |
+| 4 | public repo + release | GitHub `v0.1.3` | ✅ done |
 | 5 | first traffic | — | ⬜ 0 stars, 0 visits |
 | 6 | awesome-list listing | blocked on stars | ⛔ needs 10 / 25 stars |
 | 7 | demo video | — | ⛔ dropped: the README figure says it in one screen |
@@ -30,7 +30,7 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 ## Where things live
 - docs: `README.md` (EN), `README.zh-CN.md`, `SKILL.md`, `docs/launch.md`
 - code: `scripts/`, tests in `tests/`
-- images: `docs/how-it-works.png` (README figure, 1280×640, also the social preview), `docs/handoff-card.png`, `docs/handoff-card.zh-CN.png`
+- images: `docs/how-it-works.png` (README figure, 1280×640, also the social preview)
 
 ## Decisions
 | topic | choice | why |
@@ -43,6 +43,8 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 | name | keep `progress-brief`, always install by owner/repo | renaming loses the only searchable term; collision is already handled by the qualified install line |
 | code language | English only, one vocabulary block excepted | README, commits and issues were English while the CLI answered in Chinese; a stranger reads the code before trusting it |
 | bilingual parsing | keep Chinese headings in the keyword table | a Chinese `PROGRESS.md` is the common case for the people who ask for this; dropping it would halve the audience |
+| card fonts | PingFang + YaHei + Noto CJK + Source Han | `PingFang SC` alone exists on macOS; on Windows and Linux a Chinese title fell back to whatever the browser picked |
+| card screenshots in the repo | none | the two committed PNGs said "55 tests" and no doc showed them; the card is one command away, and a picture that lies is worse than no picture |
 
 ## Pitfalls
 1. Windows consoles default to cp1252 → every script now forces UTF-8 stdio and file IO
@@ -53,6 +55,8 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 6. This doc itself went stale (61 tests, a `docs/demo.png` that had been renamed) → `lint.py` missed it because the path sat in backticks, not in a link; rule 11 now covers links, not prose paths
 7. An animated demo lost to a static one → each gif frame held a single small panel with half the canvas empty; motion only pays when each frame carries a full screen
 8. Code comments and CLI messages were Chinese in an English repo → the fix is a test, not discipline: `tests/test_no_cjk.py` fails on any Chinese outside the one vocabulary block
+9. `card.py` printed `png  ...` whenever a file of that name already existed, even when Chrome had crashed → render to a scratch path and move it in only on success; `tests/test_card.py` now fails a browser that exits without writing
+10. The committed card PNGs kept a test count from three releases back → a generated asset carries data, so either regenerate it in the same commit as the number or do not ship it
 
 ## Next
 1. post once on X and 即刻 using the copy in `docs/launch.md`
@@ -62,4 +66,4 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 5. check `gh api repos/ming-coal/progress-brief/traffic/views` weekly
 
 ## Open questions
-- Should rule 12 also inspect backtick paths? It would have caught the `docs/demo.png` rot, but "next steps" legitimately name files that do not exist yet.
+- Should the linter also inspect backtick paths? It would have caught the `docs/demo.png` rot, but "next steps" legitimately name files that do not exist yet, and a count would have to survive both cases.

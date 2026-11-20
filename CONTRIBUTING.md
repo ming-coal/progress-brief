@@ -9,7 +9,7 @@ no runtime dependencies, no build step.
 python3 -m unittest discover -s tests -v
 ```
 
-76 tests, about 9 seconds.
+78 tests, about 16 seconds.
 
 ## Ground rules
 

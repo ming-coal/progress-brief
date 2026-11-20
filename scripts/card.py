@@ -74,7 +74,8 @@ def find_chrome():
 HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{width:1080px;height:1350px;background:#141517;color:#F2F2EF;
-  font-family:"PingFang SC","Helvetica Neue",sans-serif;position:relative;overflow:hidden}
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","Helvetica Neue",Arial,sans-serif;
+  position:relative;overflow:hidden}
 .grid{position:absolute;inset:0;background-image:
   linear-gradient(rgba(155,229,100,.09) 1px,transparent 1px),
   linear-gradient(90deg,rgba(155,229,100,.09) 1px,transparent 1px);
@@ -178,15 +179,23 @@ def main():
 
     chrome = find_chrome()
     if chrome:
-        subprocess.run([
+        # Render to a scratch file and move it in only on success. A failed
+        # screenshot used to be reported as success whenever an older png was
+        # already there, which is the one thing this tool cannot do.
+        scratch = png_path + '.tmp.png'
+        done = subprocess.run([
             chrome, '--headless=new', '--disable-gpu', '--hide-scrollbars',
             '--force-device-scale-factor=1', '--window-size=1080,1350',
-            f'--screenshot={png_path}', 'file://' + os.path.abspath(html_path),
+            f'--screenshot={scratch}', 'file://' + os.path.abspath(html_path),
         ], capture_output=True)
-        if os.path.exists(png_path):
+        if os.path.exists(scratch):
+            os.replace(scratch, png_path)
             print('png ', png_path)
         else:
+            why = (done.stderr or b'').decode('utf-8', 'replace').strip().splitlines()
             print('screenshot failed, open the html manually:', html_path)
+            if why:
+                print(' ', why[-1][:200])
     else:
         print('no chrome/chromium/edge found, open the html manually:', html_path)
         print('tip: PROGRESS_BRIEF_CHROME=/path/to/chrome python3 card.py data.json')

@@ -37,6 +37,13 @@ class CardBuild(unittest.TestCase):
         self.assertLess(long, short)
         self.assertGreaterEqual(long, 36)
 
+    def test_font_stack_has_cjk_fallbacks_for_every_os(self):
+        # PingFang ships with macOS only. Without the other two, a Chinese title
+        # renders in a browser-chosen fallback on Windows and Linux.
+        stack = re.search(r'font-family:([^;]+)', card.build({'title': 'x'})).group(1)
+        for family in ('PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC'):
+            self.assertIn(family, stack)
+
 
 class CardCli(ProjectCase):
     def test_bad_json_is_a_clean_error(self):
@@ -55,6 +62,17 @@ class CardCli(ProjectCase):
         path = self.write('s.json', '{"title":"x"}')
         run('card.py', path, env={'PATH': ''})
         self.assertTrue(os.path.exists(os.path.join(self.root, 's.html')))
+
+    def test_failed_screenshot_is_not_reported_as_success(self):
+        # A browser that exists but cannot render: python exits non-zero and
+        # writes nothing. The old png must survive and the run must say so.
+        old = self.write('s.png', b'previous render')
+        path = self.write('s.json', '{"title":"x"}')
+        out = run('card.py', path, env={'PROGRESS_BRIEF_CHROME': sys.executable})
+        self.assertIn('screenshot failed', out.stdout)
+        self.assertNotIn('png  ', out.stdout)
+        with open(old, 'rb') as fh:
+            self.assertEqual(fh.read(), b'previous render')
 
 
 if __name__ == '__main__':
