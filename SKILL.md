@@ -13,6 +13,10 @@ Outputs:
 2. `status.png` — 1080×1350 card (optional, for reporting / social)
 3. `doctor.py` verdict — continue / update / restart
 
+`$SKILL_DIR` below means the folder containing this `SKILL.md` — for example
+`~/.config/opencode/skills/progress-brief` or `~/.claude/skills/progress-brief`.
+If a shell is not available, run the same command with the absolute path you resolved.
+
 ## Hard rules
 
 - **Scan first, read second.** Never `ls` the whole repo, never read a dozen source files.
@@ -28,7 +32,7 @@ Outputs:
 ### 0. Decide first (1 second)
 
 ```bash
-python3 ~/.config/opencode/skills/progress-brief/scripts/doctor.py <path>
+python3 "$SKILL_DIR/scripts/doctor.py" <path>
 ```
 
 - exit `0` fresh → hand off as-is, don't rewrite
@@ -39,7 +43,7 @@ python3 ~/.config/opencode/skills/progress-brief/scripts/doctor.py <path>
 ### 1. Scan (~0 tokens)
 
 ```bash
-python3 ~/.config/opencode/skills/progress-brief/scripts/scan.py <path> --days 7
+python3 "$SKILL_DIR/scripts/scan.py" <path> --days 7
 ```
 
 50–65 lines: directory sizes, 12 most recent files, existing progress docs, TODO counts,
@@ -102,7 +106,7 @@ Requirements:
 ### 3.5 Lint before handing off
 
 ```bash
-python3 ~/.config/opencode/skills/progress-brief/scripts/lint.py <path>
+python3 "$SKILL_DIR/scripts/lint.py" <path>
 ```
 
 It checks the rules this skill keeps preaching: ≤120 lines, sections present and in order,
@@ -126,7 +130,7 @@ cat > status.json <<'JSON'
   "mark": "WIP"
 }
 JSON
-python3 ~/.config/opencode/skills/progress-brief/scripts/card.py status.json
+python3 "$SKILL_DIR/scripts/card.py" status.json
 ```
 
 `mark` = `WIP / DONE / BLOCKED`; words listed in `highlight` render in green.
