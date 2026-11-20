@@ -7,24 +7,35 @@
 
 ![文档没过 lint，改完通过](docs/demo.png)
 
-不绑某一个工具。本质是一份 markdown 规则 + 几个纯 Python 3.10+ 脚本，
-**只要 agent 能执行 shell 命令就能用**。
+## 安装
+
+一条命令，90+ 个 agent 都认（本质就是个带 `SKILL.md` 的仓库）：
+
+```bash
+npx skills add ming-coal/progress-brief
+```
+
+没有 Node 就直接用脚本：
 
 ```bash
 git clone https://github.com/ming-coal/progress-brief
 python3 progress-brief/scripts/install.py
 ```
 
-| 你的工具 | 怎么接进去 |
+| 你的工具 | 接入方式 |
 |---|---|
-| **OpenCode** | `--target opencode` → `~/.config/opencode/skills/` |
-| **Claude Code** | `--target claude` → `~/.claude/skills/` |
-| **Cursor · Codex · Gemini CLI · Windsurf · Cline · Copilot** | `--agents-md AGENTS.md`（或 `GEMINI.md`、`.cursor/rules/...`），装脚本并把一段规则写进该文件 |
-| **其他 agent / 聊天界面** | `--prompt` 打印一段可直接粘贴的规则 |
-| **只装到某个项目** | `--project ~/work/thing` |
-| **任意目录** | `--dest ~/tools/progress-brief` |
+| **OpenCode · Claude Code · Cursor · Codex · Gemini CLI · Windsurf · Cline · Copilot** | `npx skills add ming-coal/progress-brief`（`-g` 装到用户级，`--agent claude-code` 只装一个） |
+| **没有这个 CLI** | `python3 install.py --target opencode\|claude`，或 `--dest <任意目录>` |
+| **只读规则文件的 agent** | `python3 install.py --agents-md AGENTS.md`（也可 `GEMINI.md`、`.cursor/rules/...`） |
+| **聊天界面** | `python3 install.py --prompt` 打印一段可粘贴的规则 |
 
-`--agents-md` 是幂等的：重跑只会替换那一段，文件其他地方不动。
+`--agents-md` 是幂等的：重跑只替换那一段，文件其他地方不动。
+
+### 或者直接跟 agent 说
+
+> 安装 skill `ming-coal/progress-brief`，然后在这个项目上用
+
+只要它能跑 shell 就够：仓库能从 GitHub 解析，根目录的 `SKILL.md` 就是全部定义。
 
 然后直接说：「这个项目做到一半了，帮我整理个进度，我下次换窗口接着做」。
 

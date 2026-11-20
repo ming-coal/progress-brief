@@ -8,8 +8,15 @@ restart the conversation instead of pushing on.
 
 ![The doc fails lint, gets fixed, passes](docs/demo.png)
 
-Not tied to one agent. The skill is markdown plus plain Python 3.10+ scripts; it works
-anywhere an agent can run a shell command.
+## Install
+
+One command, 90+ agents (it is a normal `SKILL.md` repo, so the standard CLI finds it):
+
+```bash
+npx skills add ming-coal/progress-brief
+```
+
+No Node? Use the scripts directly:
 
 ```bash
 git clone https://github.com/ming-coal/progress-brief
@@ -18,14 +25,19 @@ python3 progress-brief/scripts/install.py
 
 | your tool | how it gets wired |
 |---|---|
-| **OpenCode** | `--target opencode` → `~/.config/opencode/skills/` |
-| **Claude Code** | `--target claude` → `~/.claude/skills/` |
-| **Cursor · Codex · Gemini CLI · Windsurf · Cline · Copilot** | `--agents-md AGENTS.md` (or `GEMINI.md`, `.cursor/rules/...`) — installs the scripts and writes a managed block into that file |
-| **any other agent / chat UI** | `--prompt` prints a paste-ready block |
-| **one project only** | `--project ~/work/thing` |
-| **custom location** | `--dest ~/tools/progress-brief` |
+| **OpenCode · Claude Code · Cursor · Codex · Gemini CLI · Windsurf · Cline · Copilot** | `npx skills add ming-coal/progress-brief` (add `-g` for user-level, `--agent claude-code` to target one) |
+| **anything without the CLI** | `python3 install.py --target opencode\|claude`, or `--dest <dir>` for any folder |
+| **agents that only read a rules file** | `python3 install.py --agents-md AGENTS.md` (also `GEMINI.md`, `.cursor/rules/...`) |
+| **chat UIs** | `python3 install.py --prompt` prints a paste-ready block |
 
-`--agents-md` is idempotent: re-running replaces the block and leaves the rest of the file alone.
+`--agents-md` is idempotent: re-running replaces its block and leaves the rest of the file alone.
+
+### Or just tell your agent
+
+> install the skill `ming-coal/progress-brief`, then use it on this project
+
+That is enough for any agent that can run a shell: the repo resolves from GitHub, and the
+`SKILL.md` at the root is the whole definition.
 
 Then just say: *"this project is half done — give me a progress brief for the next window."*
 
