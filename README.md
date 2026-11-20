@@ -4,6 +4,8 @@
 Generates a converged `PROGRESS.md` for the next window, lints it, and tells you when to
 restart the conversation instead of pushing on.
 
+[![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
+
 ![progress-brief status card](docs/hero.png)
 
 Works with **OpenCode** and **Claude Code** (Agent Skills format). Stdlib Python 3.10+,

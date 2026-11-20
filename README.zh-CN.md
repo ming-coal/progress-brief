@@ -3,6 +3,8 @@
 **读仓库的交接工具，而不只是读聊天记录。**
 为下一个窗口生成一份收敛的 `PROGRESS.md`，顺手体检它，并判断这轮对话该继续还是该重开。
 
+[![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
+
 ![progress-brief 状态卡](docs/hero.png)
 
 支持 **OpenCode** 和 **Claude Code**（Agent Skills 格式）。纯 Python 3.10+，零依赖，
