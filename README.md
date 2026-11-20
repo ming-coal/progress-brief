@@ -6,7 +6,7 @@ restart the conversation instead of pushing on.
 
 [![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
 
-![progress-brief status card](docs/hero.png)
+![progress-brief status card](docs/handoff-card.png)
 
 Works with **OpenCode** and **Claude Code** (Agent Skills format). Stdlib Python 3.10+,
 no dependencies, macOS / Linux / Windows.
