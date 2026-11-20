@@ -6,7 +6,7 @@ restart the conversation instead of pushing on.
 
 [![test](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml/badge.svg)](https://github.com/ming-coal/progress-brief/actions/workflows/test.yml)
 
-![The doc fails lint, gets fixed, passes](docs/demo.png)
+![The doc fails lint, gets fixed, passes](docs/how-it-works.png)
 
 ## Install
 
