@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.5 — 2026-11-21
+
+- **The saving percentage now names what it is compared against.** The ledger line said
+  "99% cheaper than typical", and `SKILL.md` defined "typical" as "what a person actually
+  reads" — something the tool cannot know. It is a model: the root docs plus the 20 largest
+  source files. The line prints "99% cheaper than reading those 22 files", and the README
+  calls the column modelled, warns that an agent which greps well reads less, and says the
+  percentage is a ceiling rather than a promise.
+- The table's last column is "fewer tokens" instead of "saved": 99% on a 210-file repo,
+  13% on a 31-file one, and under 15 text files the tool refuses. The 13% row was always
+  there; the header implied the headline held everywhere.
+- Launch copy follows: the Show HN note and the 即刻 post quote the baseline and the small-repo
+  case instead of leading with 99%.
+- 81 tests, up from 80: the ledger line now has to contain "cheaper than reading those N
+  files", so the baseline cannot silently disappear again.
+
 ## 0.1.4 — 2026-11-20
 
 - **The test count in the docs is now a test.** `README.md` still said "55 stdlib tests"

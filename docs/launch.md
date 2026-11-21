@@ -37,7 +37,7 @@ description: >-
 Row for the `Community Skills` table:
 
 ```markdown
-- **[progress-brief](https://github.com/ming-coal/progress-brief)** - Repo-first handoff skill: scans the project, writes a converged PROGRESS.md, lints it, and decides when to restart the session. Stdlib Python, no dependencies, 80 tests.
+- **[progress-brief](https://github.com/ming-coal/progress-brief)** - Repo-first handoff skill: scans the project, writes a converged PROGRESS.md, lints it, and decides when to restart the session. Stdlib Python, no dependencies, 81 tests.
 ```
 
 PR body:
@@ -50,7 +50,7 @@ PR body:
 >
 > - repo: https://github.com/ming-coal/progress-brief
 > - license: MIT
-> - tests: 80, CI on macOS/Linux/Windows × Python 3.10–3.13
+> - tests: 81, CI on macOS/Linux/Windows × Python 3.10–3.13
 >
 > I have read CONTRIBUTING.md and am submitting this myself, not via an automated agent.
 
@@ -69,7 +69,9 @@ Post once per channel, different opening line each time. Never paste the same te
 > writing, and lints the result before you hand it over. It also tells you when to abandon
 > the window instead of continuing. Plain Python, no deps, MIT.
 >
-> Numbers: on a 210-file repo, a typical pickup is ~66k tokens; this costs ~840.
+> Numbers: on a 210-file repo, reading the root docs plus the 20 biggest files is ~66k
+> tokens by our estimate; the brief is ~840. On a 30-file repo it saves ~13%, and it says
+> so instead of quoting the big number.
 
 **r/ClaudeAI**
 
@@ -87,7 +89,7 @@ Post once per channel, different opening line each time. Never paste the same te
 >
 > scan → PROGRESS.md → lint → "restart the window"
 >
-> Plain Python. 80 tests. MIT.
+> Plain Python. 81 tests. MIT.
 
 **即刻 / V2EX**
 
@@ -95,7 +97,8 @@ Post once per channel, different opening line each time. Never paste the same te
 >
 > 交接文档最大的问题是“看起来完成了”。所以我加了 lint：模糊表述、缺小节、不可执行的
 > 下一步、泄露的密钥，直接判失败；再加 doctor 比对文档和真实改动，过期就拦下。
-> 210 个文件的项目，接手成本从 6.6 万 token 降到 840。
+> 按“根文档 + 20 个最大文件”估，210 个文件的项目接手要 6.6 万 token，写成交接文档是 840。
+> 30 个文件的项目只省 13%，它自己会说“收益一般”。这个数是上限，不是承诺。
 
 ## 30 days
 
@@ -126,5 +129,6 @@ Traffic is kept for 14 days only. Record it weekly.
 - buy stars or trade them — every later number becomes untrustworthy
 - post the same copy on five platforms the same day
 - drop the link in someone else's issue or PR
-- lead with "saves 99% of tokens" — it is false on small repos and easy to disprove
+- lead with "saves 99% of tokens" — true only against our own model of a large repo, and
+  false on a 30-file one; quote the baseline or quote nothing
 - submit to a list before meeting its stated bar

@@ -328,8 +328,8 @@ def main():
     elif typical > 0:
         gain = 100 * (1 - brief / typical)
         tail = '  ·  small project, modest gain' if gain < 30 else ''
-        add(f'  -> {gain:.0f}% cheaper than typical'
-            f'  ·  {100 * (1 - brief / worst):.0f}% cheaper than worst case{tail}')
+        add(f'  -> {gain:.0f}% cheaper than reading those {len(set(typical_set))} files'
+            f'  ·  {100 * (1 - brief / worst):.0f}% cheaper than every file{tail}')
 
     if not as_json and not no_ledger:
         rows = read_ledger()

@@ -152,13 +152,16 @@ Every `scan.py` run prints and records:
   worst    read every text file   210 files  ~289k tok
   typical  docs + 20 largest       22 files  ~66k tok
   brief    scan output + PROGRESS.md          ~843 tok
-  => 99% less than typical
+  => 99% less than reading those 22 files
   cumulative 3 runs  ~121k tok saved
 ```
 
 - **worst** = every text file: the real ceiling for "start from zero".
-- **typical** = root docs + 20 largest source files: what a person actually reads.
+- **typical** = root docs + 20 largest source files. A model of one pickup, not a
+  measurement: an agent that greps well reads fewer files, and then the saving is smaller.
 - **brief** = this tool's cost.
+- Quote the baseline with the number — "99% less than reading those 22 files", never a bare
+  "saves 99%". The percentage is a ceiling for a repo of that shape.
 - Exact when `tiktoken` is installed; otherwise calibrated estimate (±20%, median error 6.8% on a 263-file corpus). The label in the output says which. Never report it as precise.
 - Re-fit on a new corpus with `scripts/calibrate.py --fit <dirs>`.
 - Ledger lives at `.usage.jsonl` next to `scripts/`; delete it to reset.

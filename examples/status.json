@@ -4,7 +4,7 @@
   "highlight": [
     "30-second"
   ],
-  "status": "v0.1.3 · 80 tests · MIT",
+  "status": "v0.1.5 · 81 tests · MIT",
   "stats": [
     {
       "k": "handoff cost",
@@ -27,5 +27,5 @@
     "more skills"
   ],
   "foot": "github.com/ming-coal/progress-brief",
-  "mark": "v0.1.3"
+  "mark": "v0.1.5"
 }

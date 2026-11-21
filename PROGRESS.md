@@ -14,7 +14,7 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 | `scripts/lint.py` | 11 rules | vague wording, sections, actionable steps, secrets, dead images |
 | `scripts/card.py` | 1080×1350 PNG | auto-detects Chrome/Chromium/Edge/Brave, says so when the render fails |
 | `scripts/install.py` | any agent | `--target`, `--dest`, `--agents-md`, `--prompt` |
-| `tests/` | 80 tests | CI: 3 OS × Python 3.10/3.12/3.13 |
+| `tests/` | 81 tests | CI: 3 OS × Python 3.10/3.12/3.13 |
 
 ## Progress
 | # | item | where | state |
@@ -37,7 +37,7 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 |---|---|---|
 | repo layout | one repo per skill, plus a `skills` index | different audiences, separate release cadence |
 | runtime | stdlib only, `tiktoken` optional | install must never fail on a missing dependency |
-| claims | publish the small-repo number too | 99% only holds for big repos; hiding that invites a takedown |
+| claims | publish the small-repo number too, and name the baseline | 99% only holds for big repos, and only against a modelled pickup; a number without its denominator is a slogan |
 | registry | `npx skills add ming-coal/progress-brief` | the standard CLI resolves any repo with `SKILL.md` at root |
 | demo form | one static 1280×640 figure | the 3-frame gif showed one small terminal per frame with half the canvas empty; side by side says what it writes and what it catches in one look |
 | name | keep `progress-brief`, always install by owner/repo | renaming loses the only searchable term; collision is already handled by the qualified install line |
@@ -57,7 +57,8 @@ converged `PROGRESS.md`, lints it, and says when to restart the conversation.
 8. Code comments and CLI messages were Chinese in an English repo → the fix is a test, not discipline: `tests/test_no_cjk.py` fails on any Chinese outside the one vocabulary block
 9. `card.py` printed `png  ...` whenever a file of that name already existed, even when Chrome had crashed → render to a scratch path and move it in only on success; `tests/test_card.py` now fails a browser that exits without writing
 10. `README.md` promised "55 stdlib tests, 3 OS × 2 Python versions" while 78 tests ran on three Python versions → prose numbers are invisible to a link checker; `tests/test_docs.py` counts the tests and the matrix now)
-11. The committed card PNGs kept a test count from three releases back → a generated asset carries data, so either regenerate it in the same commit as the number or do not ship it
+11. The ledger line said "cheaper than typical" — a denominator the reader cannot see, so it was read as "cheaper than my agent" → it now prints "cheaper than reading those 22 files", and the README calls the column a model
+12. The committed card PNGs kept a test count from three releases back → a generated asset carries data, so either regenerate it in the same commit as the number or do not ship it
 
 ## Next
 1. post once on X and 即刻 using the copy in `docs/launch.md`

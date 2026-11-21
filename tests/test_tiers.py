@@ -48,7 +48,7 @@ def saving(stdout):
     line = [l for l in stdout.splitlines() if l.strip().startswith('->')]
     if not line:
         return None
-    m = re.search(r'(-?\d+)% cheaper than typical', line[0])
+    m = re.search(r'(-?\d+)% cheaper than reading those (\d+) files', line[0])
     return int(m.group(1)) if m else None
 
 
@@ -78,6 +78,14 @@ class Tiers(ProjectCase):
         # "a small repo saves far less than a large one", not a fixed percentage.
         self.assertGreaterEqual(value, 40)
         self.assertLess(value, 80)
+
+    def test_saving_names_what_it_is_compared_against(self):
+        # "cheaper than typical" was read as "cheaper than your agent would
+        # have spent". It is cheaper than one modelled pickup, so say which.
+        self.build(180, n_docs=8, body=90)
+        self.write('PROGRESS.md', LANDING.format(name='large'))
+        line = [l for l in self.scan().stdout.splitlines() if l.strip().startswith('->')]
+        self.assertRegex(line[0], r'cheaper than reading those \d+ files')
 
     def test_large_is_big(self):
         self.build(180, n_docs=8, body=90)

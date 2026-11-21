@@ -86,7 +86,7 @@ files: 226  size: 2.6MB
   worst    every text file     210 files  ~ 289k tok
   typical  root docs + 20 src   22 files  ~ 66k tok
   brief    scan output + PROGRESS.md       ~ 843 tok
-  -> 99% cheaper than typical  ·  99% cheaper than worst case
+  -> 99% cheaper than reading those 22 files  ·  99% cheaper than every file
 ```
 
 A `PROGRESS.md` under 120 lines ([example](examples/PROGRESS.md)), a lint pass over it,
@@ -99,11 +99,17 @@ Chinese docs: **median error 6.8%, p90 14.5%**, plus a separate correction for t
 own tabular output (0.4% off in the check below). Install `tiktoken` and the numbers
 become exact; without it the output says it is estimating.
 
-| repo | text files | read everything | typical pickup | this tool | verdict |
+| repo | text files | read everything | typical pickup (modelled) | this tool | fewer tokens |
 |---|---|---|---|---|---|
-| real Next.js app | 210 | 289k | 66k | **843** | 99% saved |
-| sandbox fixture | 31 | 2k | 1k | 1k | 13% saved |
+| real Next.js app | 210 | 289k | 66k | **843** | 99% |
+| sandbox fixture | 31 | 2k | 1k | 1k | 13% |
 | 2-file folder | 2 | 3 | 3 | 243 | **refuses** |
+
+"Typical pickup" is `root docs + the 20 largest source files`. That is a model of what a
+pickup costs, not a measurement of your agent — an agent that greps well reads fewer files,
+so treat the percentage as a ceiling. It is 99% on a repo with hundreds of files and 13% on
+one with thirty; the tool prints the number it computes for the project in front of it,
+including the case where writing the doc costs more than reading.
 
 Small projects get told to skip it. That is the feature, and `tests/test_tiers.py`
 reproduces all three rows in CI so the table cannot drift from the code.
@@ -150,7 +156,7 @@ the repo side: what actually changed, what's stale, and whether the window is wo
 | `scripts/card.py` | JSON → HTML + PNG (auto-finds Chrome/Chromium/Edge) |
 | `scripts/calibrate.py` | re-fit the token estimate against `tiktoken` |
 | `scripts/install.py` | installer (`--target`, `--dest`, `--agents-md`, `--prompt`) |
-| `tests/` | 80 stdlib tests, CI on 3 OS × 3 Python versions |
+| `tests/` | 81 stdlib tests, CI on 3 OS × 3 Python versions |
 
 ## Honest limits
 

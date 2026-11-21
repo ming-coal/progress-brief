@@ -80,7 +80,7 @@ files: 226  size: 2.6MB
   worst    every text file     210 files  ~ 289k tok
   typical  root docs + 20 src   22 files  ~ 66k tok
   brief    scan output + PROGRESS.md       ~ 843 tok
-  -> 99% cheaper than typical  ·  99% cheaper than worst case
+  -> 99% cheaper than reading those 22 files  ·  99% cheaper than every file
 ```
 
 一份 ≤120 行的 [PROGRESS.md 示例](examples/PROGRESS.md)、一次 lint 检查，
@@ -91,11 +91,16 @@ files: 226  size: 2.6MB
 用 `tiktoken`（cl100k）在 263 个真实文件上拟合，覆盖代码、英文文档、中文文档：
 **中位误差 6.8%，p90 14.5%**；对工具自己生成的表格文本另做修正（实测偏差 0.4%）。
 
-| 仓库 | 文本文件 | 通读全部 | 典型接手 | 本方案 | 结论 |
+| 仓库 | 文本文件 | 通读全部 | 典型接手（估算模型） | 本方案 | 少用多少 token |
 |---|---|---|---|---|---|
-| 真实 Next.js 项目 | 210 | 289k | 66k | **843** | 省 99% |
-| 测试沙盒 | 31 | 2k | 1k | 1k | 省 13% |
+| 真实 Next.js 项目 | 210 | 289k | 66k | **843** | 99% |
+| 测试沙盒 | 31 | 2k | 1k | 1k | 13% |
 | 2 个文件的目录 | 2 | 3 | 3 | 243 | **劝你别用** |
+
+所谓“典型接手”是 `根文档 + 20 个最大的源文件`。这是对一次接手要花多少 token 的**建模**，
+不是对你那个 agent 的实测：会 grep 的 agent 读得更少，所以百分比该当成上限，不是承诺。
+几百个文件的项目是 99%，三十个文件的是 13%；工具每次打印的是它针对眼前这个项目算出来的
+数，包括“写文档比直接读还贵”那种情况。
 
 小项目会被劝退，这是功能。`tests/test_tiers.py` 在 CI 里复现这三行，表格和代码不会对不上。
 
@@ -139,7 +144,7 @@ python scripts/scan.py   . --json     # 机器可读指标
 | `scripts/card.py` | JSON → HTML + PNG（自动找 Chrome/Chromium/Edge） |
 | `scripts/calibrate.py` | 用 `tiktoken` 重新拟合估算系数 |
 | `scripts/install.py` | 安装（`--target`、`--dest`、`--agents-md`、`--prompt`） |
-| `tests/` | 80 个标准库测试，CI 覆盖 3 系统 × 3 个 Python 版本 |
+| `tests/` | 81 个标准库测试，CI 覆盖 3 系统 × 3 个 Python 版本 |
 
 ## 诚实的边界
 
