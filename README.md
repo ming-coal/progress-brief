@@ -72,8 +72,13 @@ stop" is the part people get wrong.**
 | not sure whether to restart | "should I start a new window for this?" |
 | a card to post | "make me a status card" |
 | did it pay off | "how many tokens did this save?" |
+| is the doc still true | "is the progress doc still accurate?" |
 
 You never name a file or a script. It picks what to read.
+
+**How often**: not on a schedule. Under three changed source files the doc is still true and
+rewriting it is waste; past twenty, or seven days with five changes, it is actively misleading.
+One refresh per finished work block, not one per commit.
 
 ## What you get
 
@@ -129,10 +134,15 @@ A prompt can't fail a build. This can.
 - a project runs across days, windows, or models
 - the conversation gets long and starts contradicting itself
 - right after a merge / release / export — a natural break
+- right after you climb out of a bug — that is the one moment the pitfall is still accurate
 - taking over someone else's repo
 - a series (one directory per episode, one brief each)
 
 **Not for**: one-off scripts, unstarted projects, folders under ~15 text files — it says so.
+
+**What only you can write**: the progress table can be regenerated from `git log` and the
+scan. *Pitfalls* and *decisions* cannot — the agent knows what you chose, not what you
+rejected or why. Say the symptom → cause → fix out loud, once.
 
 ## Related work
 
